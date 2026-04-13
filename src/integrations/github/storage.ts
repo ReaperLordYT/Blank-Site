@@ -7,8 +7,8 @@
 const CONFIG_KEY = 'npc-github-config';
 const DATA_FILE = 'public/data.json';
 export const PUBLIC_REPO = {
-  owner: 'HWRBot',
-  repo: 'tournament-site-ghpages',
+  owner: 'ReaperLordYT',
+  repo: 'NPC-Site',
   branch: 'main',
 } as const;
 
