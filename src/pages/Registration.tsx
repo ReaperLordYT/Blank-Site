@@ -7,6 +7,7 @@ import { FileText, Users, AlertTriangle } from 'lucide-react';
 
 const Registration: React.FC = () => {
   const { data, updateSettings } = useTournament();
+  const settings = data.settings;
 
   return (
     <PageLayout>
@@ -14,8 +15,8 @@ const Registration: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-5xl font-bold gradient-text mb-6 text-center">Регистрация</h1>
           <EditableText
-            value="Приём заявок открыт до 28.03.2026 00:00"
-            onSave={() => {}}
+            value={settings.registrationDeadlineText}
+            onSave={val => updateSettings({ registrationDeadlineText: val })}
             as="p"
             className="text-center text-muted-foreground mb-12 text-lg"
           />
@@ -25,8 +26,8 @@ const Registration: React.FC = () => {
               <FileText className="text-primary" size={24} /> Как подать заявку
             </h2>
             <EditableText
-              value="Каждая команда подаёт заявку через Google форму. Убедитесь, что все данные заполнены корректно."
-              onSave={() => {}}
+              value={settings.registrationHowToText}
+              onSave={val => updateSettings({ registrationHowToText: val })}
               as="p"
               className="text-muted-foreground mb-6"
             />
@@ -45,18 +46,16 @@ const Registration: React.FC = () => {
               <AlertTriangle className="text-primary" size={24} /> Правила участия
             </h2>
             <ul className="space-y-4 text-muted-foreground">
-              {[
-                'Суммарный рейтинг команды (5 игроков) не более 30 000 MMR',
-                'У каждого игрока должен быть открытый DotaBuff',
-                'Команда должна состоять минимум из 5 основных игроков',
-                'Запасные игроки допускаются и не учитываются в лимите MMR',
-                'Капитан команды несёт ответственность за все действия состава',
-              ].map((text, i) => (
+              {settings.registrationRules.map((text, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-heading font-bold text-sm flex-shrink-0 mt-0.5">{i + 1}</span>
                   <EditableText
                     value={text}
-                    onSave={() => {}}
+                    onSave={val => {
+                      const next = [...settings.registrationRules];
+                      next[i] = val;
+                      updateSettings({ registrationRules: next });
+                    }}
                     as="span"
                     className="text-muted-foreground"
                   />

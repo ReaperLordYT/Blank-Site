@@ -16,6 +16,10 @@ const fadeUp = {
 const Index: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings, getTeamById } = useTournament();
   const settings = data.settings;
+  const scheduledMatches = data.matches
+    .filter(match => match.status === 'scheduled')
+    .sort((a, b) => `${a.scheduledDate}${a.scheduledTime}`.localeCompare(`${b.scheduledDate}${b.scheduledTime}`))
+    .slice(0, 5);
 
   // Info cards
   const handleUpdateCard = (id: string, field: 'label' | 'desc', val: string) => {
@@ -198,6 +202,11 @@ const Index: React.FC = () => {
                 )}
                 <h3 className="font-heading font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">{team.name}</h3>
                 <p className="text-xs text-muted-foreground">[{team.tag}]</p>
+                {team.titleText && (
+                  <p className={`text-[11px] mt-1 ${team.titleStyle === 'current' ? 'text-amber-300' : 'text-primary'}`}>
+                    {team.titleEmoji || '🏆'} {team.titleText}
+                  </p>
+                )}
               </Link>
             ))}
           </div>
@@ -205,20 +214,20 @@ const Index: React.FC = () => {
       )}
 
       {/* Schedule */}
-      {data.matches.length > 0 && (
-        <section className="container mx-auto px-4 py-16">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="section-title">Расписание матчей</h2>
-            <Link to="/schedule" className="text-primary font-heading font-semibold flex items-center gap-1 hover:underline">
-              Полное расписание <ChevronRight size={16} />
-            </Link>
-          </div>
+      <section className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="section-title">Расписание матчей</h2>
+          <Link to="/schedule" className="text-primary font-heading font-semibold flex items-center gap-1 hover:underline">
+            Полное расписание <ChevronRight size={16} />
+          </Link>
+        </div>
+        {scheduledMatches.length > 0 ? (
           <div className="space-y-3">
-            {data.matches.slice(0, 5).map(match => {
+            {scheduledMatches.map(match => {
               const t1 = getTeamById(match.team1Id);
               const t2 = getTeamById(match.team2Id);
               return (
-                <div key={match.id} className={`glass-card rounded-xl p-4 flex items-center justify-between ${match.status === 'live' ? 'ring-1 ring-red-500/40' : ''}`}>
+                <div key={match.id} className="glass-card rounded-xl p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
                     <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-heading">{match.format}</span>
                     <div className="flex items-center gap-2">
@@ -237,21 +246,31 @@ const Index: React.FC = () => {
                         <Tv size={14} /> Трансляция
                       </a>
                     )}
-                    {match.result && <span className="font-heading font-bold text-foreground">{match.result.team1Score} - {match.result.team2Score}</span>}
-                    <span className={`px-2 py-0.5 rounded text-xs font-heading ${
-                      match.status === 'live' ? 'bg-red-500/20 text-red-400 animate-pulse' :
-                      match.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                      'bg-muted text-muted-foreground'
-                    }`}>
-                      {match.status === 'live' ? '🔴 LIVE' : match.status === 'completed' ? 'Завершён' : 'Запланирован'}
+                    <span className="px-2 py-0.5 rounded text-xs font-heading bg-muted text-muted-foreground">
+                      Запланирован
                     </span>
                   </div>
                 </div>
               );
             })}
           </div>
-        </section>
-      )}
+        ) : (
+          <div className="glass-card rounded-xl p-8 text-center text-muted-foreground">
+            <EditableText
+              value={settings.tournamentCompleted ? settings.scheduleCompletedText : settings.schedulePreparingText}
+              onSave={val => {
+                if (settings.tournamentCompleted) {
+                  updateSettings({ scheduleCompletedText: val });
+                } else {
+                  updateSettings({ schedulePreparingText: val });
+                }
+              }}
+              as="p"
+              className="text-muted-foreground"
+            />
+          </div>
+        )}
+      </section>
 
       {/* FAQ */}
       <section className="container mx-auto px-4 py-16">

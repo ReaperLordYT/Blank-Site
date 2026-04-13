@@ -267,6 +267,60 @@ const Admin: React.FC = () => {
               </select>
             </div>
             <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Текст: дедлайн регистрации</label>
+              <input
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.registrationDeadlineText}
+                onChange={e => setSettings(p => ({ ...p, registrationDeadlineText: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Текст: как подать заявку</label>
+              <textarea
+                className="w-full bg-background border rounded-lg p-3 text-foreground min-h-[88px]"
+                value={settings.registrationHowToText}
+                onChange={e => setSettings(p => ({ ...p, registrationHowToText: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Правила регистрации (по одной строке)</label>
+              <textarea
+                className="w-full bg-background border rounded-lg p-3 text-foreground min-h-[140px] font-mono text-xs"
+                value={settings.registrationRules.join('\n')}
+                onChange={e => setSettings(p => ({
+                  ...p,
+                  registrationRules: e.target.value.split('\n').map(x => x.trim()).filter(Boolean),
+                }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">Режим турнира</label>
+              <select
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.tournamentCompleted ? 'completed' : 'active'}
+                onChange={e => setSettings(p => ({ ...p, tournamentCompleted: e.target.value === 'completed' }))}
+              >
+                <option value="active">Активный (расписание готовится)</option>
+                <option value="completed">Завершён</option>
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Плашка: расписание готовится</label>
+              <input
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.schedulePreparingText}
+                onChange={e => setSettings(p => ({ ...p, schedulePreparingText: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Плашка: турнир завершён</label>
+              <input
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.scheduleCompletedText}
+                onChange={e => setSettings(p => ({ ...p, scheduleCompletedText: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-2">
               <label className="text-sm text-muted-foreground mb-1 block flex items-center gap-2">
                 <Music size={16} /> Фоновая музыка
               </label>

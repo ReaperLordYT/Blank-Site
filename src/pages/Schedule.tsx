@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Info, Edit2, Tv, Check, X, ChevronUp, ChevronDown, ChevronsUpDown, Filter, FilterX } from 'lucide-react';
 import { formatDate } from '@/lib/dateFormat';
 import { TournamentMatch } from '@/types/tournament';
+import { Link } from 'react-router-dom';
 
 type SortCol = 'date' | 'time' | 'match' | 'stage' | 'format' | 'result' | 'status';
 type SortDir = 'asc' | 'desc';
@@ -69,6 +70,7 @@ const Schedule: React.FC = () => {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [editForm, setEditForm] = useState({
     scheduledDate: '', scheduledTime: '', streamLink: '',
     status: 'scheduled' as TournamentMatch['status'],
@@ -149,6 +151,12 @@ const Schedule: React.FC = () => {
   };
 
   const selectedMatchData = selectedMatch ? data.matches.find(m => m.id === selectedMatch) : null;
+  useEffect(() => {
+    if (selectedMatch && detailsRef.current) {
+      detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedMatch]);
+
   const t1Full = selectedMatchData ? getTeamById(selectedMatchData.team1Id) : null;
   const t2Full = selectedMatchData ? getTeamById(selectedMatchData.team2Id) : null;
 
@@ -209,7 +217,7 @@ const Schedule: React.FC = () => {
         {/* Match detail modal */}
         <AnimatePresence>
           {selectedMatchData && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card rounded-2xl p-6 mb-8 max-w-3xl mx-auto">
+            <motion.div ref={detailsRef} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card rounded-2xl p-6 mb-8 max-w-3xl mx-auto">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-heading text-xl font-bold text-foreground">Подробности матча</h3>
                 <button onClick={() => setSelectedMatch(null)} className="text-muted-foreground hover:text-foreground">✕</button>
@@ -231,7 +239,16 @@ const Schedule: React.FC = () => {
                   <div key={idx} className="bg-background/50 rounded-xl p-4">
                     <div className="flex items-center gap-3 mb-4">
                       {team?.logo && <img src={team.logo} alt="" className="w-12 h-12 rounded-lg object-cover" />}
-                      <div><h4 className="font-heading font-bold text-foreground text-lg">{team?.name || 'TBD'}</h4><p className="text-xs text-muted-foreground">[{team?.tag}]</p></div>
+                      <div>
+                        {team ? (
+                          <Link to={`/teams/${team.id}`} className="font-heading font-bold text-foreground text-lg hover:text-primary transition-colors">
+                            {team.name}
+                          </Link>
+                        ) : (
+                          <h4 className="font-heading font-bold text-foreground text-lg">TBD</h4>
+                        )}
+                        <p className="text-xs text-muted-foreground">[{team?.tag}]</p>
+                      </div>
                     </div>
                     {team?.players.map(p => (
                       <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 text-sm">

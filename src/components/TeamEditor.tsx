@@ -29,6 +29,9 @@ const TeamEditor: React.FC<TeamEditorProps> = ({ teamId, onClose }) => {
   const [logo, setLogo] = useState(existing?.logo || '');
   const [status, setStatus] = useState<Team['status']>(existing?.status || 'pending');
   const [dqReason, setDqReason] = useState(existing?.disqualificationReason || '');
+  const [titleText, setTitleText] = useState(existing?.titleText || '');
+  const [titleEmoji, setTitleEmoji] = useState(existing?.titleEmoji || '');
+  const [titleStyle, setTitleStyle] = useState<Team['titleStyle']>(existing?.titleStyle || 'legacy');
   const [players, setPlayers] = useState<Player[]>(
     existing?.players.length
       ? existing.players.map(player => ({
@@ -59,6 +62,9 @@ const TeamEditor: React.FC<TeamEditorProps> = ({ teamId, onClose }) => {
       id: existing?.id || Date.now().toString(),
       name, tag, logo, status, players,
       disqualificationReason: status === 'disqualified' ? dqReason : undefined,
+      titleText: titleText.trim() || undefined,
+      titleEmoji: titleEmoji.trim() || undefined,
+      titleStyle,
     };
     if (existing) updateTeam(team);
     else addTeam(team);
@@ -106,6 +112,35 @@ const TeamEditor: React.FC<TeamEditorProps> = ({ teamId, onClose }) => {
             <Upload size={18} /> {logo ? 'Изменить логотип' : 'Загрузить логотип'}
           </button>
           {logo && <img src={logo} alt="logo" className="h-12 mt-2 rounded" />}
+        </div>
+        <div>
+          <label className="text-sm text-muted-foreground mb-1 block">Титул команды</label>
+          <input
+            className="w-full bg-background border rounded-lg p-3 text-foreground"
+            placeholder="Например: Победитель прошлого NPC"
+            value={titleText}
+            onChange={e => setTitleText(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="text-sm text-muted-foreground mb-1 block">Эмодзи титула</label>
+          <input
+            className="w-full bg-background border rounded-lg p-3 text-foreground"
+            placeholder="🏆"
+            value={titleEmoji}
+            onChange={e => setTitleEmoji(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="text-sm text-muted-foreground mb-1 block">Стиль титула</label>
+          <select
+            className="w-full bg-background border rounded-lg p-3 text-foreground"
+            value={titleStyle}
+            onChange={e => setTitleStyle(e.target.value as Team['titleStyle'])}
+          >
+            <option value="legacy">Обычный (прошлый турнир)</option>
+            <option value="current">Яркий (текущий чемпион)</option>
+          </select>
         </div>
       </div>
 

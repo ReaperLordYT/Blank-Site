@@ -3,17 +3,32 @@ import { Link } from 'react-router-dom';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
 import { motion } from 'framer-motion';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Search } from 'lucide-react';
 import TeamEditor from '@/components/TeamEditor';
+import { Team } from '@/types/tournament';
 
 const Teams: React.FC = () => {
   const { data, isAdmin, isEditing, deleteTeam } = useTournament();
   const [showEditor, setShowEditor] = React.useState(false);
+  const [statusFilter, setStatusFilter] = React.useState<Team['status'] | 'all'>('confirmed');
+  const [search, setSearch] = React.useState('');
 
   const totalMmr = (players: any[]) =>
     players
       .filter((p: any) => !p.isSubstitute)
       .reduce((s: number, p: any) => s + (p.mmr || 0), 0);
+
+  const filteredTeams = data.teams.filter(team => {
+    if (statusFilter !== 'all' && team.status !== statusFilter) return false;
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return team.name.toLowerCase().includes(q) || team.tag.toLowerCase().includes(q);
+  });
+
+  const getTitleClass = (style?: Team['titleStyle']) =>
+    style === 'current'
+      ? 'bg-gradient-to-r from-amber-300/30 via-yellow-300/25 to-orange-400/30 text-amber-200 border border-amber-300/40 shadow-[0_0_20px_rgba(251,191,36,0.25)]'
+      : 'bg-primary/10 text-primary border border-primary/30';
 
   return (
     <PageLayout>
@@ -31,9 +46,31 @@ const Teams: React.FC = () => {
         </div>
 
         {showEditor && <TeamEditor onClose={() => setShowEditor(false)} />}
+        <div className="mb-8 flex flex-wrap gap-3 items-center">
+          <div className="relative flex-1 min-w-[220px]">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              className="w-full bg-card border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground"
+              placeholder="Поиск по названию или тегу"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <select
+            className="bg-card border rounded-lg px-3 py-2 text-sm text-foreground"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value as Team['status'] | 'all')}
+          >
+            <option value="confirmed">Подтверждена</option>
+            <option value="pending">Ожидается</option>
+            <option value="withdrawn">Снялась</option>
+            <option value="disqualified">Дисквалифицирована</option>
+            <option value="all">Все статусы</option>
+          </select>
+        </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data.teams.map((team, i) => (
+          {filteredTeams.map((team, i) => (
             <motion.div
               key={team.id}
               initial={{ opacity: 0, y: 20 }}
@@ -55,6 +92,11 @@ const Teams: React.FC = () => {
                       {team.name}
                     </h3>
                     <p className="text-sm text-muted-foreground">[{team.tag}]</p>
+                    {team.titleText && (
+                      <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded mt-1 ${getTitleClass(team.titleStyle)}`}>
+                        {team.titleEmoji || '🏆'} {team.titleText}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -84,7 +126,7 @@ const Teams: React.FC = () => {
           ))}
         </div>
 
-        {data.teams.length === 0 && (
+        {filteredTeams.length === 0 && (
           <div className="text-center py-20 text-muted-foreground">Команд пока нет</div>
         )}
       </div>

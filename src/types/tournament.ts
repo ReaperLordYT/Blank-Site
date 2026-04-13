@@ -20,6 +20,9 @@ export interface Team {
   disqualificationReason?: string;
   withdrawalReason?: string;
   groupId?: string;
+  titleText?: string;
+  titleEmoji?: string;
+  titleStyle?: 'legacy' | 'current';
 }
 
 export interface NewsItem {
@@ -92,6 +95,12 @@ export interface SiteSettings {
   heroSubtitle: string;
   aboutText: string;
   aboutText2: string;
+  registrationDeadlineText: string;
+  registrationHowToText: string;
+  registrationRules: string[];
+  tournamentCompleted: boolean;
+  schedulePreparingText: string;
+  scheduleCompletedText: string;
   mvpText: string;
   mvpPrize: string;
   musicUrl: string;

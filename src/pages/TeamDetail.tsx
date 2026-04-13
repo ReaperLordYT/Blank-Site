@@ -21,6 +21,7 @@ const TeamDetail: React.FC = () => {
   const [showEditor, setShowEditor] = React.useState(false);
   const [showWithdraw, setShowWithdraw] = React.useState(false);
   const [withdrawReason, setWithdrawReason] = React.useState('');
+  const [selectedMatchId, setSelectedMatchId] = React.useState<string | null>(null);
 
   if (!team) {
     return (
@@ -57,6 +58,13 @@ const TeamDetail: React.FC = () => {
     withdrawn:     { label: 'Снялась',          bg: 'bg-muted',        text: 'text-muted-foreground' },
   };
   const sc = statusConfig[team.status] ?? statusConfig.pending;
+  const selectedMatch = selectedMatchId ? teamMatches.find(m => m.id === selectedMatchId) : null;
+  const selectedOpponent = selectedMatch
+    ? data.teams.find(t => t.id === (selectedMatch.team1Id === team.id ? selectedMatch.team2Id : selectedMatch.team1Id))
+    : null;
+  const titleClass = team.titleStyle === 'current'
+    ? 'bg-gradient-to-r from-amber-300/30 via-yellow-300/25 to-orange-400/30 text-amber-200 border border-amber-300/40 shadow-[0_0_25px_rgba(251,191,36,0.25)]'
+    : 'bg-primary/10 text-primary border border-primary/30';
 
   return (
     <PageLayout>
@@ -83,6 +91,11 @@ const TeamDetail: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <h1 className={`font-display text-3xl font-bold text-foreground ${team.status === 'withdrawn' ? 'line-through opacity-60' : ''}`}>{team.name}</h1>
                 <p className="text-muted-foreground font-heading">[{team.tag}]</p>
+                {team.titleText && (
+                  <span className={`inline-flex items-center gap-1 mt-2 px-3 py-1 rounded text-xs font-heading ${titleClass}`}>
+                    {team.titleEmoji || '🏆'} {team.titleText}
+                  </span>
+                )}
                 <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-heading ${sc.bg} ${sc.text}`}>
                   {sc.label}
                 </span>
@@ -202,7 +215,14 @@ const TeamDetail: React.FC = () => {
                     : match.status === 'cancelled' ? 'opacity-50' : '';
 
                   return (
-                    <div key={match.id} className={`glass-card rounded-xl p-5 ${resultBg}`}>
+                    <div
+                      key={match.id}
+                      onClick={() => {
+                        setSelectedMatchId(match.id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`glass-card rounded-xl p-5 ${resultBg} w-full text-left cursor-pointer`}
+                    >
                       {/* Row 1: opponent + score */}
                       <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
                         <div className="flex items-center gap-3">
@@ -210,7 +230,7 @@ const TeamDetail: React.FC = () => {
                             ? <img src={opp.logo} alt={opp.name} className="w-10 h-10 rounded-lg object-cover" />
                             : <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground">{opp?.tag?.[0] || '?'}</div>
                           }
-                          <div>
+                          <div className="min-w-0">
                             <p className="font-heading font-bold text-foreground text-base">vs {opp?.name || 'TBD'}</p>
                             {opp?.tag && <p className="text-xs text-muted-foreground">[{opp.tag}]</p>}
                           </div>
@@ -265,6 +285,45 @@ const TeamDetail: React.FC = () => {
                 })}
               </div>
             </>
+          )}
+          {selectedMatch && (
+            <div className="glass-card rounded-2xl p-6 mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-heading text-xl font-bold text-foreground">Подробности матча</h3>
+                <button className="text-muted-foreground hover:text-foreground" onClick={() => setSelectedMatchId(null)}>✕</button>
+              </div>
+              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
+                <span>{stageLabels[selectedMatch.stage] || selectedMatch.stage}</span>
+                <span>{selectedMatch.format}</span>
+                {selectedMatch.scheduledDate && <span>{formatDate(selectedMatch.scheduledDate)}</span>}
+                {selectedMatch.scheduledTime && <span>{selectedMatch.scheduledTime}</span>}
+              </div>
+              {selectedMatch.result && (
+                <div className="text-2xl font-display font-bold text-foreground mb-4">
+                  {selectedMatch.result.team1Score} : {selectedMatch.result.team2Score}
+                </div>
+              )}
+              <div className="flex gap-3">
+                <Link to={`/teams/${team.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
+                  {team.name}
+                </Link>
+                {selectedOpponent && (
+                  <Link to={`/teams/${selectedOpponent.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
+                    {selectedOpponent.name}
+                  </Link>
+                )}
+                {selectedMatch.streamLink && (
+                  <a
+                    href={selectedMatch.streamLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 border rounded-lg text-sm hover:text-primary inline-flex items-center gap-1"
+                  >
+                    <Tv size={14} /> Трансляция
+                  </a>
+                )}
+              </div>
+            </div>
           )}
         </motion.div>
       </div>
