@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Plus, Trash2, RefreshCw, Tv, Edit2, Check, X, Trophy, Crown, Link, Move } from 'lucide-react';
 import { TournamentMatch, Group, BracketConnection } from '@/types/tournament';
 import { formatDate } from '@/lib/dateFormat';
+import { Link as RouterLink } from 'react-router-dom';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface MatchEditState {
@@ -32,7 +33,7 @@ function initEdit(m: TournamentMatch): MatchEditState {
 }
 
 // ─── Inline MatchCard (for match list below bracket) ────────────────────────
-const MatchCard: React.FC<{ match: TournamentMatch }> = ({ match }) => {
+const MatchCard: React.FC<{ match: TournamentMatch; onOpenDetails?: (match: TournamentMatch) => void }> = ({ match, onOpenDetails }) => {
   const { getTeamById, isAdmin, isEditing, updateMatch, deleteMatch } = useTournament();
   const t1 = getTeamById(match.team1Id);
   const t2 = getTeamById(match.team2Id);
@@ -64,7 +65,12 @@ const MatchCard: React.FC<{ match: TournamentMatch }> = ({ match }) => {
   const t2Win = !!(match.result && match.result.team2Score >= winsRequired && match.result.team2Score > match.result.team1Score);
 
   return (
-    <div className={`glass-card rounded-xl p-4 ${match.status === 'live' ? 'ring-1 ring-red-500/40' : ''} ${match.status === 'cancelled' ? 'opacity-50' : ''}`}>
+    <div
+      onClick={() => {
+        if (!editing && onOpenDetails) onOpenDetails(match);
+      }}
+      className={`glass-card rounded-xl p-4 ${match.status === 'live' ? 'ring-1 ring-red-500/40' : ''} ${match.status === 'cancelled' ? 'opacity-50' : ''} ${!editing && onOpenDetails ? 'cursor-pointer' : ''}`}
+    >
       {editing ? (
         <div className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -139,11 +145,11 @@ const MatchCard: React.FC<{ match: TournamentMatch }> = ({ match }) => {
             {match.result && <span className="font-heading font-bold text-lg text-foreground">{match.result.team1Score} — {match.result.team2Score}</span>}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {match.streamLink && <a href={match.streamLink} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-heading flex items-center gap-1"><Tv size={12} /> Трансляция</a>}
+            {match.streamLink && <a href={match.streamLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs text-primary hover:underline font-heading flex items-center gap-1"><Tv size={12} /> Трансляция</a>}
             {isAdmin && isEditing && (
               <div className="flex gap-1">
-                <button onClick={() => { setEd(initEdit(match)); setEditing(true); }} className="p-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"><Edit2 size={14} /></button>
-                <button onClick={() => deleteMatch(match.id)} className="p-1.5 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"><Trash2 size={14} /></button>
+                <button onClick={e => { e.stopPropagation(); setEd(initEdit(match)); setEditing(true); }} className="p-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"><Edit2 size={14} /></button>
+                <button onClick={e => { e.stopPropagation(); deleteMatch(match.id); }} className="p-1.5 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"><Trash2 size={14} /></button>
               </div>
             )}
           </div>
@@ -959,6 +965,7 @@ const Tournament: React.FC = () => {
   const [editingFormulaId, setEditingFormulaId] = useState<string | null>(null);
   const [formulaDraft, setFormulaDraft] = useState('');
   const [showNewMatch, setShowNewMatch] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<TournamentMatch | null>(null);
   const [newMatch, setNewMatch] = useState({
     team1Id: '', team2Id: '', format: 'Bo1' as TournamentMatch['format'],
     stage: 'playoff-upper' as TournamentMatch['stage'],
@@ -1025,6 +1032,8 @@ const Tournament: React.FC = () => {
 
   const bracketMatches = data.matches.filter(m => m.stage !== 'group');
   const teamsNotInGroups = data.teams.filter(t => !data.groups.some(g => g.teamIds.includes(t.id)));
+  const selectedT1 = selectedMatch ? getTeamById(selectedMatch.team1Id) : null;
+  const selectedT2 = selectedMatch ? getTeamById(selectedMatch.team2Id) : null;
 
   const NewMatchPanel = () => (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-background/50 rounded-lg border border-border/50 mt-4">
@@ -1249,7 +1258,7 @@ const Tournament: React.FC = () => {
                   {groupMatches.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-heading font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">Матчи группы</h4>
-                      {groupMatches.map(match => <MatchCard key={match.id} match={match} />)}
+                      {groupMatches.map(match => <MatchCard key={match.id} match={match} onOpenDetails={setSelectedMatch} />)}
                     </div>
                   )}
                 </motion.div>
@@ -1311,9 +1320,48 @@ const Tournament: React.FC = () => {
             {isAdmin && isEditing && bracketMatches.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-heading font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">Все матчи (список для редактирования)</h4>
-                {bracketMatches.map(m => <MatchCard key={m.id} match={m} />)}
+                {bracketMatches.map(m => <MatchCard key={m.id} match={m} onOpenDetails={setSelectedMatch} />)}
               </div>
             )}
+          </div>
+        )}
+        {selectedMatch && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedMatch(null)}>
+            <div className="max-w-2xl mx-auto mt-16 glass-card rounded-2xl p-6" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-heading text-xl font-bold text-foreground">Подробности матча</h3>
+                <button className="text-muted-foreground hover:text-foreground" onClick={() => setSelectedMatch(null)}>✕</button>
+              </div>
+              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
+                <span>{selectedMatch.stage}</span>
+                <span>{selectedMatch.format}</span>
+                {selectedMatch.round && <span>Раунд {selectedMatch.round}</span>}
+                {selectedMatch.scheduledDate && <span>{formatDate(selectedMatch.scheduledDate)}</span>}
+                {selectedMatch.scheduledTime && <span>{selectedMatch.scheduledTime}</span>}
+              </div>
+              {selectedMatch.result && (
+                <div className="text-2xl font-display font-bold text-foreground mb-4">
+                  {selectedMatch.result.team1Score} : {selectedMatch.result.team2Score}
+                </div>
+              )}
+              <div className="flex gap-3 flex-wrap">
+                {selectedT1 && (
+                  <RouterLink to={`/teams/${selectedT1.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary" onClick={() => setSelectedMatch(null)}>
+                    {selectedT1.name}
+                  </RouterLink>
+                )}
+                {selectedT2 && (
+                  <RouterLink to={`/teams/${selectedT2.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary" onClick={() => setSelectedMatch(null)}>
+                    {selectedT2.name}
+                  </RouterLink>
+                )}
+                {selectedMatch.streamLink && (
+                  <a href={selectedMatch.streamLink} target="_blank" rel="noopener noreferrer" className="px-3 py-2 border rounded-lg text-sm hover:text-primary inline-flex items-center gap-1">
+                    <Tv size={14} /> Трансляция
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

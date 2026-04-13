@@ -219,7 +219,6 @@ const TeamDetail: React.FC = () => {
                       key={match.id}
                       onClick={() => {
                         setSelectedMatchId(match.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       className={`glass-card rounded-xl p-5 ${resultBg} w-full text-left cursor-pointer`}
                     >
@@ -275,7 +274,7 @@ const TeamDetail: React.FC = () => {
                         )}
                         {match.round && <span className="flex items-center gap-1">Раунд {match.round}</span>}
                         {match.streamLink && (
-                          <a href={match.streamLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
+                          <a href={match.streamLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="flex items-center gap-1 text-primary hover:underline">
                             <Tv size={11} /> Трансляция
                           </a>
                         )}
@@ -287,41 +286,43 @@ const TeamDetail: React.FC = () => {
             </>
           )}
           {selectedMatch && (
-            <div className="glass-card rounded-2xl p-6 mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-heading text-xl font-bold text-foreground">Подробности матча</h3>
-                <button className="text-muted-foreground hover:text-foreground" onClick={() => setSelectedMatchId(null)}>✕</button>
-              </div>
-              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
-                <span>{stageLabels[selectedMatch.stage] || selectedMatch.stage}</span>
-                <span>{selectedMatch.format}</span>
-                {selectedMatch.scheduledDate && <span>{formatDate(selectedMatch.scheduledDate)}</span>}
-                {selectedMatch.scheduledTime && <span>{selectedMatch.scheduledTime}</span>}
-              </div>
-              {selectedMatch.result && (
-                <div className="text-2xl font-display font-bold text-foreground mb-4">
-                  {selectedMatch.result.team1Score} : {selectedMatch.result.team2Score}
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedMatchId(null)}>
+              <div className="max-w-2xl mx-auto mt-16 glass-card rounded-2xl p-6" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-heading text-xl font-bold text-foreground">Подробности матча</h3>
+                  <button className="text-muted-foreground hover:text-foreground" onClick={() => setSelectedMatchId(null)}>✕</button>
                 </div>
-              )}
-              <div className="flex gap-3">
-                <Link to={`/teams/${team.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
-                  {team.name}
-                </Link>
-                {selectedOpponent && (
-                  <Link to={`/teams/${selectedOpponent.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
-                    {selectedOpponent.name}
+                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
+                  <span>{stageLabels[selectedMatch.stage] || selectedMatch.stage}</span>
+                  <span>{selectedMatch.format}</span>
+                  {selectedMatch.scheduledDate && <span>{formatDate(selectedMatch.scheduledDate)}</span>}
+                  {selectedMatch.scheduledTime && <span>{selectedMatch.scheduledTime}</span>}
+                </div>
+                {selectedMatch.result && (
+                  <div className="text-2xl font-display font-bold text-foreground mb-4">
+                    {selectedMatch.result.team1Score} : {selectedMatch.result.team2Score}
+                  </div>
+                )}
+                <div className="flex gap-3 flex-wrap">
+                  <Link to={`/teams/${team.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
+                    {team.name}
                   </Link>
-                )}
-                {selectedMatch.streamLink && (
-                  <a
-                    href={selectedMatch.streamLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-2 border rounded-lg text-sm hover:text-primary inline-flex items-center gap-1"
-                  >
-                    <Tv size={14} /> Трансляция
-                  </a>
-                )}
+                  {selectedOpponent && (
+                    <Link to={`/teams/${selectedOpponent.id}`} className="px-3 py-2 border rounded-lg text-sm hover:text-primary">
+                      {selectedOpponent.name}
+                    </Link>
+                  )}
+                  {selectedMatch.streamLink && (
+                    <a
+                      href={selectedMatch.streamLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 border rounded-lg text-sm hover:text-primary inline-flex items-center gap-1"
+                    >
+                      <Tv size={14} /> Трансляция
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           )}
