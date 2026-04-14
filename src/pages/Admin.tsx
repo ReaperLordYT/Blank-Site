@@ -106,7 +106,6 @@ const Admin: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
           {[
             { label: 'Команды', path: '/teams', count: data.teams.length },
-            { label: 'Новости', path: '/news', count: data.news.length },
             { label: 'Матчи', path: '/schedule', count: data.matches.length },
             { label: 'Турнир', path: '/tournament', count: data.groups.length + ' групп' },
             { label: 'Регистрация', path: '/registration', count: '' },

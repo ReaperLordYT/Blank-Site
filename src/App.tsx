@@ -16,8 +16,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Registration from "./pages/Registration";
 import Rules from "./pages/Rules";
-import News from "./pages/News";
-import NewsDetail from "./pages/NewsDetail";
 import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
 import Tournament from "./pages/Tournament";
@@ -40,8 +38,6 @@ const AppInner: React.FC = () => {
         <Route path="/" element={<Index />} />
         <Route path="/registration" element={<Registration />} />
         <Route path="/rules" element={<Rules />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/news/:id" element={<NewsDetail />} />
         <Route path="/teams" element={<Teams />} />
         <Route path="/teams/:id" element={<TeamDetail />} />
         <Route path="/tournament" element={<Tournament />} />

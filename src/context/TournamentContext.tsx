@@ -16,14 +16,14 @@ import {
 const defaultSettings: SiteSettings = {
   discordLink: 'https://discord.gg/dokapipsi',
   googleFormLink: 'https://docs.google.com/forms/d/1M-m6MBHP49yfmJiNrY-egpyf-K6w34qoetGS6nwCirE/edit#responses',
-  tournamentName: 'NPC CHAMPIONSHIP',
+  tournamentName: 'BLANK CHAMPIONSHIP',
   tournamentDates: '28.03.2026 – 29.03.2026',
   rulesMode: 'page',
   rulesLink: '',
   contactAdmin1: '4 callings bird (@fakalin)',
   contactAdmin2: 'daphne (@dmcmlll)',
   heroSubtitle: 'Турнир по Dota 2 для команд с суммарным MMR до 30 000',
-  aboutText: 'NPC Championship — турнир по Dota 2 для команд с ограничением по рейтингу. Мы создали этот турнир, чтобы дать возможность игрокам среднего уровня почувствовать атмосферу настоящего киберспортивного состязания.',
+  aboutText: 'Blank Championship — турнир по Dota 2 для команд с ограничением по рейтингу. Мы создали этот турнир, чтобы дать возможность игрокам среднего уровня почувствовать атмосферу настоящего киберспортивного состязания.',
   aboutText2: 'Суммарный рейтинг 5 основных игроков не должен превышать 30 000 MMR. Запасные игроки допускаются и не входят в лимит.',
   registrationDeadlineText: 'Приём заявок открыт до 28.03.2026 00:00',
   registrationHowToText: 'Каждая команда подаёт заявку через Google форму. Убедитесь, что все данные заполнены корректно.',
@@ -69,7 +69,7 @@ const defaultSettings: SiteSettings = {
 const defaultData: TournamentData = {
   teams: [],
   news: [
-    { id: '1', title: 'NPC Championship анонсирован!', summary: 'Первый турнир NPC Championship пройдёт 28-29 марта 2026 года. Регистрация открыта!', content: 'Мы рады объявить о проведении первого турнира NPC Championship по Dota 2!', image: '', date: '2026-03-15' },
+    { id: '1', title: 'Blank Championship анонсирован!', summary: 'Первый турнир Blank Championship пройдёт 28-29 марта 2026 года. Регистрация открыта!', content: 'Мы рады объявить о проведении первого турнира Blank Championship по Dota 2!', image: '', date: '2026-03-15' },
     { id: '2', title: 'Регистрация команд открыта', summary: 'Подача заявок через Google форму.', content: 'Регистрация команд открыта! Подайте заявку через Google форму до 28.03.2026.', image: '', date: '2026-03-16' },
     { id: '3', title: 'Правила турнира опубликованы', summary: 'Ознакомьтесь с полным регламентом.', content: 'Полный регламент опубликован на сайте.', image: '', date: '2026-03-17' },
   ],

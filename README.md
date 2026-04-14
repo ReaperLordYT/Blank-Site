@@ -1,4 +1,4 @@
-# NPC Championship Tournament Site
+# Blank Championship Tournament Site
 
 ## Что изменилось
 
@@ -43,7 +43,7 @@
 Создай `.env.local` и добавь:
 
 ```bash
-VITE_BASE_URL=/NPC-Site/
+VITE_BASE_URL=/Blank-Site/
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 VITE_SUPABASE_ADMIN_EMAILS=admin1@mail.com,admin2@mail.com

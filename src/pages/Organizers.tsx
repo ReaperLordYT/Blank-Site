@@ -25,7 +25,7 @@ const Organizers: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-4xl font-bold gradient-text mb-4 text-center">Организаторы</h1>
           <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            Команда, которая стоит за NPC Championship
+            Команда, которая стоит за Blank Championship
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">

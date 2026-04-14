@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="border-t mt-8 pt-8 text-center text-muted-foreground text-xs">
-          © 2026 NPC Championship. Все права защищены.
+          © 2026 Blank Championship. Все права защищены.
         </div>
       </div>
     </footer>

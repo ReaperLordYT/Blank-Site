@@ -9,7 +9,6 @@ const navItems = [
   { path: '/', label: 'Главная' },
   { path: '/registration', label: 'Регистрация' },
   { path: '/rules', label: 'Регламент' },
-  { path: '/news', label: 'Новости' },
   { path: '/teams', label: 'Команды' },
   { path: '/tournament', label: 'Турнир' },
   { path: '/schedule', label: 'Расписание' },
@@ -153,7 +152,7 @@ const Header: React.FC = () => {
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b bg-background/80">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <Link to="/" className="font-display text-xl font-bold gradient-text tracking-wider">
-          NPC
+          Blank
         </Link>
 
         {/* Desktop Nav */}

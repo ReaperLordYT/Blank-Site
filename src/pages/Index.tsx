@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTournament } from '@/context/TournamentContext';
 import EditableText from '@/components/EditableText';
 import PageLayout from '@/components/PageLayout';
 import { Calendar, Users, Trophy, MessageCircle, FileText, ChevronRight, HelpCircle, Tv, Plus, Trash2 } from 'lucide-react';
-import { formatDate } from '@/lib/dateFormat';
-import { InfoCard, FormatStage, FaqItem } from '@/types/tournament';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -151,34 +149,6 @@ const Index: React.FC = () => {
             </div>
           )}
         </motion.div>
-      </section>
-
-      {/* Latest News */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="flex items-center justify-between mb-10">
-          <h2 className="section-title">Новости</h2>
-          <Link to="/news" className="text-primary font-heading font-semibold flex items-center gap-1 hover:underline">
-            Все новости <ChevronRight size={16} />
-          </Link>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {data.news.slice(0, 3).map((item, i) => (
-            <motion.div key={item.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-              <Link to={`/news/${item.id}`} className="block glass-card rounded-xl overflow-hidden card-glow group">
-                {item.image && (
-                  <div className="h-48 overflow-hidden">
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                )}
-                <div className="p-6">
-                  <p className="text-xs text-muted-foreground mb-2">{formatDate(item.date)}</p>
-                  <h3 className="font-heading font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{item.summary}</p>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
       </section>
 
       {/* Teams */}

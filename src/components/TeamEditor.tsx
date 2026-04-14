@@ -117,7 +117,7 @@ const TeamEditor: React.FC<TeamEditorProps> = ({ teamId, onClose }) => {
           <label className="text-sm text-muted-foreground mb-1 block">Титул команды</label>
           <input
             className="w-full bg-background border rounded-lg p-3 text-foreground"
-            placeholder="Например: Победитель прошлого NPC"
+            placeholder="Например: Победитель прошлого Blank"
             value={titleText}
             onChange={e => setTitleText(e.target.value)}
           />

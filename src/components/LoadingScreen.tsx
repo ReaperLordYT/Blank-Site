@@ -8,7 +8,7 @@ const LoadingScreen: React.FC = () => (
       <div className="absolute -inset-4 rounded-full border border-primary/20 animate-ping" />
     </div>
     <div className="font-display text-2xl font-black tracking-widest text-foreground mb-2">
-      NPC CHAMPIONSHIP
+      BLANK CHAMPIONSHIP
     </div>
     <div className="flex gap-1 mt-4">
       {[0, 1, 2].map(i => (
