@@ -14,7 +14,7 @@ import {
 } from '@/integrations/supabase/storage';
 
 const defaultSettings: SiteSettings = {
-  discordLink: 'https://discord.gg/dokapipsi',
+  discordLink: 'https://discord.gg/npcalert',
   googleFormLink: 'https://docs.google.com/forms/d/1M-m6MBHP49yfmJiNrY-egpyf-K6w34qoetGS6nwCirE/edit#responses',
   tournamentName: 'BLANK CHAMPIONSHIP',
   tournamentDates: '28.03.2026 – 29.03.2026',
@@ -64,6 +64,11 @@ const defaultSettings: SiteSettings = {
     { id: '1', name: '4 поющих птицы (@fakalin)', role: 'Организатор' },
     { id: '2', name: 'дафна (@dmcmlll)', role: 'Организатор' },
   ],
+  contactsList: ['4 callings bird (@fakalin)', 'daphne (@dmcmlll)'],
+  footerCopyright: '© 2026 Blank Championship. Все права защищены.',
+  maintenanceEnabled: false,
+  maintenanceTitle: 'Технические работы',
+  maintenanceMessage: 'Сайт временно недоступен. Пожалуйста, зайдите позже.',
 };
 
 const defaultData: TournamentData = {

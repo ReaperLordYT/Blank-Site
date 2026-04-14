@@ -63,8 +63,19 @@ const Organizers: React.FC = () => {
           <div className="glass-card rounded-2xl p-8 text-center card-glow">
             <h2 className="font-heading text-xl font-bold text-foreground mb-6">Контакты</h2>
             <div className="flex flex-col items-center gap-3">
-              <EditableText value={settings.contactAdmin1} onSave={val => updateSettings({ contactAdmin1: val })} as="p" className="text-muted-foreground" />
-              <EditableText value={settings.contactAdmin2} onSave={val => updateSettings({ contactAdmin2: val })} as="p" className="text-muted-foreground" />
+              {settings.contactsList.map((contact, idx) => (
+                <EditableText
+                  key={`${contact}-${idx}`}
+                  value={contact}
+                  onSave={val => {
+                    const next = [...settings.contactsList];
+                    next[idx] = val;
+                    updateSettings({ contactsList: next });
+                  }}
+                  as="p"
+                  className="text-muted-foreground"
+                />
+              ))}
               <a href={settings.discordLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline mt-2">
                 <MessageCircle size={18} /> Discord-сервер
               </a>

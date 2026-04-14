@@ -187,6 +187,25 @@ const Admin: React.FC = () => {
               <label className="text-sm text-muted-foreground mb-1 block">Контакт админа 2</label>
               <input className="w-full bg-background border rounded-lg p-3 text-foreground" value={settings.contactAdmin2} onChange={e => setSettings(p => ({ ...p, contactAdmin2: e.target.value }))} />
             </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Контакты (для страницы контактов и футера, по одной строке)</label>
+              <textarea
+                className="w-full bg-background border rounded-lg p-3 text-foreground min-h-[120px]"
+                value={settings.contactsList.join('\n')}
+                onChange={e => setSettings(p => ({
+                  ...p,
+                  contactsList: e.target.value.split('\n').map(x => x.trim()).filter(Boolean),
+                }))}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Текст в футере (копирайт)</label>
+              <input
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.footerCopyright}
+                onChange={e => setSettings(p => ({ ...p, footerCopyright: e.target.value }))}
+              />
+            </div>
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">Ссылка на регламент (Google Docs)</label>
               <input className="w-full bg-background border rounded-lg p-3 text-foreground" placeholder="https://docs.google.com/..." value={settings.rulesLink} onChange={e => setSettings(p => ({ ...p, rulesLink: e.target.value }))} />
@@ -235,6 +254,33 @@ const Admin: React.FC = () => {
                 <option value="active">Активный (расписание готовится)</option>
                 <option value="completed">Завершён</option>
               </select>
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">Режим техработ</label>
+              <select
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.maintenanceEnabled ? 'on' : 'off'}
+                onChange={e => setSettings(p => ({ ...p, maintenanceEnabled: e.target.value === 'on' }))}
+              >
+                <option value="off">Выключен</option>
+                <option value="on">Включен</option>
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Заголовок страницы техработ</label>
+              <input
+                className="w-full bg-background border rounded-lg p-3 text-foreground"
+                value={settings.maintenanceTitle}
+                onChange={e => setSettings(p => ({ ...p, maintenanceTitle: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-sm text-muted-foreground mb-1 block">Сообщение на странице техработ</label>
+              <textarea
+                className="w-full bg-background border rounded-lg p-3 text-foreground min-h-[90px]"
+                value={settings.maintenanceMessage}
+                onChange={e => setSettings(p => ({ ...p, maintenanceMessage: e.target.value }))}
+              />
             </div>
             <div className="md:col-span-2">
               <label className="text-sm text-muted-foreground mb-1 block">Плашка: расписание готовится</label>

@@ -34,14 +34,30 @@ const Footer: React.FC = () => {
               <a href={settings.discordLink} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                 Discord-сервер
               </a>
-              <EditableText value={settings.contactAdmin1} onSave={val => updateSettings({ contactAdmin1: val })} as="p" className="text-muted-foreground" />
-              <EditableText value={settings.contactAdmin2} onSave={val => updateSettings({ contactAdmin2: val })} as="p" className="text-muted-foreground" />
+              {settings.contactsList.map((contact, idx) => (
+                <EditableText
+                  key={`${contact}-${idx}`}
+                  value={contact}
+                  onSave={val => {
+                    const next = [...settings.contactsList];
+                    next[idx] = val;
+                    updateSettings({ contactsList: next });
+                  }}
+                  as="p"
+                  className="text-muted-foreground"
+                />
+              ))}
               <Link to="/organizers" className="text-primary hover:underline mt-1">Все организаторы →</Link>
             </div>
           </div>
         </div>
         <div className="border-t mt-8 pt-8 text-center text-muted-foreground text-xs">
-          © 2026 Blank Championship. Все права защищены.
+          <EditableText
+            value={settings.footerCopyright}
+            onSave={val => updateSettings({ footerCopyright: val })}
+            as="span"
+            className="text-muted-foreground"
+          />
         </div>
       </div>
     </footer>

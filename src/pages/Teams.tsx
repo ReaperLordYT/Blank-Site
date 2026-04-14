@@ -10,7 +10,7 @@ import { Team } from '@/types/tournament';
 const Teams: React.FC = () => {
   const { data, isAdmin, isEditing, deleteTeam } = useTournament();
   const [showEditor, setShowEditor] = React.useState(false);
-  const [statusFilter, setStatusFilter] = React.useState<Team['status'] | 'all'>('confirmed');
+  const [statusFilter, setStatusFilter] = React.useState<Team['status'] | 'all'>('all');
   const [search, setSearch] = React.useState('');
 
   const totalMmr = (players: any[]) =>
@@ -22,7 +22,19 @@ const Teams: React.FC = () => {
     if (statusFilter !== 'all' && team.status !== statusFilter) return false;
     const q = search.trim().toLowerCase();
     if (!q) return true;
-    return team.name.toLowerCase().includes(q) || team.tag.toLowerCase().includes(q);
+    const teamMatches =
+      team.name.toLowerCase().includes(q) ||
+      team.tag.toLowerCase().includes(q);
+    if (teamMatches) return true;
+
+    return team.players.some(player => {
+      const steam64 = player.steamLink.match(/\d{16,20}/)?.[0] ?? '';
+      return (
+        player.nickname.toLowerCase().includes(q) ||
+        player.steamLink.toLowerCase().includes(q) ||
+        steam64.includes(q)
+      );
+    });
   });
 
   const getTitleClass = (style?: Team['titleStyle']) =>
@@ -51,7 +63,7 @@ const Teams: React.FC = () => {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               className="w-full bg-card border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground"
-              placeholder="Поиск по названию или тегу"
+              placeholder="Поиск: команда, никнейм или Steam64"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -61,11 +73,11 @@ const Teams: React.FC = () => {
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as Team['status'] | 'all')}
           >
+            <option value="all">Все статусы</option>
             <option value="confirmed">Подтверждена</option>
             <option value="pending">Ожидается</option>
             <option value="withdrawn">Снялась</option>
             <option value="disqualified">Дисквалифицирована</option>
-            <option value="all">Все статусы</option>
           </select>
         </div>
 

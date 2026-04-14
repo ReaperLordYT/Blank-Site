@@ -110,6 +110,11 @@ export interface SiteSettings {
   formatStages: FormatStage[];
   faqItems: FaqItem[];
   staffMembers: StaffMember[];
+  contactsList: string[];
+  footerCopyright: string;
+  maintenanceEnabled: boolean;
+  maintenanceTitle: string;
+  maintenanceMessage: string;
 }
 
 export interface TournamentData {

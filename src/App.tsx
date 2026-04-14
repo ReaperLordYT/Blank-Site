@@ -1,6 +1,6 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,13 +22,22 @@ import Tournament from "./pages/Tournament";
 import Schedule from "./pages/Schedule";
 import Admin from "./pages/Admin";
 import Organizers from "./pages/Organizers";
+import Maintenance from "./pages/Maintenance";
 
 const queryClient = new QueryClient();
 
 const AppInner: React.FC = () => {
-  const { loading } = useTournament();
+  const { loading, data } = useTournament();
+  const location = useLocation();
 
   if (loading) return <LoadingScreen />;
+  const maintenanceEnabled = data.settings.maintenanceEnabled;
+  const isAdminRoute = location.pathname === "/admin";
+  const isMaintenanceRoute = location.pathname === "/maintenance";
+
+  if (maintenanceEnabled && !isAdminRoute && !isMaintenanceRoute) {
+    return <Navigate to="/maintenance" replace />;
+  }
 
   return (
     <>
@@ -44,6 +53,7 @@ const AppInner: React.FC = () => {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/organizers" element={<Organizers />} />
+        <Route path="/maintenance" element={<Maintenance />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
