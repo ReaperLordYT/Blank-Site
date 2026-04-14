@@ -28,8 +28,12 @@ import FreePlayers from "./pages/FreePlayers";
 const queryClient = new QueryClient();
 
 const AppInner: React.FC = () => {
-  const { loading, data } = useTournament();
+  const { loading, data, refreshData } = useTournament();
   const location = useLocation();
+
+  React.useEffect(() => {
+    void refreshData();
+  }, [location.pathname, refreshData]);
 
   if (loading) return <LoadingScreen />;
   const maintenanceEnabled = data.settings.maintenanceEnabled;
@@ -38,6 +42,9 @@ const AppInner: React.FC = () => {
 
   if (maintenanceEnabled && !isAdminRoute && !isMaintenanceRoute) {
     return <Navigate to="/maintenance" replace />;
+  }
+  if (!maintenanceEnabled && isMaintenanceRoute) {
+    return <Navigate to="/" replace />;
   }
 
   return (

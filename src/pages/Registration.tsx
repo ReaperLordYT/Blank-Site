@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
 import EditableText from '@/components/EditableText';
 import { motion } from 'framer-motion';
-import { FileText, Users, AlertTriangle } from 'lucide-react';
+import { FileText, Users } from 'lucide-react';
 
 const Registration: React.FC = () => {
   const { data, updateSettings } = useTournament();
@@ -41,27 +42,16 @@ const Registration: React.FC = () => {
             </a>
           </div>
 
-          <div className="glass-card rounded-2xl p-8 card-glow">
-            <h2 className="font-heading text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
-              <AlertTriangle className="text-primary" size={24} /> Правила участия
-            </h2>
-            <ul className="space-y-4 text-muted-foreground">
-              {settings.registrationRules.map((text, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-heading font-bold text-sm flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <EditableText
-                    value={text}
-                    onSave={val => {
-                      const next = [...settings.registrationRules];
-                      next[i] = val;
-                      updateSettings({ registrationRules: next });
-                    }}
-                    as="span"
-                    className="text-muted-foreground"
-                  />
-                </li>
-              ))}
-            </ul>
+          <div className="glass-card rounded-2xl p-8 card-glow text-center">
+            <p className="text-muted-foreground text-lg">
+              Ознакомьтесь с регламентом перед подачей заявки.
+            </p>
+            <Link
+              to="/rules"
+              className="inline-flex mt-5 px-6 py-2 rounded-lg border border-border bg-card/50 hover:bg-card text-foreground font-heading font-semibold transition-colors"
+            >
+              Перейти к регламенту
+            </Link>
           </div>
         </motion.div>
       </div>
