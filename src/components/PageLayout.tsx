@@ -51,8 +51,8 @@ const PageLayout: React.FC<{ children: React.ReactNode; hideFooter?: boolean }> 
       <div className="fixed inset-0 bg-background/70 pointer-events-none z-0" />
       <div
         ref={catRef}
-        className={`fixed right-[-6px] bottom-8 z-[5] pointer-events-none select-none hidden md:block transition-transform duration-500 ${
-          showCat ? 'translate-x-0' : 'translate-x-[120%]'
+        className={`fixed left-[-6px] bottom-8 z-[5] pointer-events-none select-none hidden md:block transition-transform duration-500 ${
+          showCat ? 'translate-x-0' : '-translate-x-[120%]'
         }`}
       >
         <img
@@ -60,7 +60,6 @@ const PageLayout: React.FC<{ children: React.ReactNode; hideFooter?: boolean }> 
           alt=""
           aria-hidden="true"
           className={`w-[170px] lg:w-[210px] opacity-90 ${showCat ? 'animate-cat-peek' : ''}`}
-          style={{ mixBlendMode: 'screen' }}
         />
       </div>
       <div className="relative z-10">
