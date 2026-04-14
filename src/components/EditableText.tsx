@@ -80,13 +80,18 @@ const EditableText: React.FC<EditableTextProps> = ({ value, onSave, as: Tag = 'p
     );
   }
 
+  const hasText = value.trim().length > 0;
   return (
     <Tag
-      className={`${className} editable-highlight cursor-pointer`}
+      className={`${className} editable-highlight cursor-pointer ${hasText ? '' : 'min-h-[1.5em] inline-block w-full'}`}
       onClick={() => { setText(value); setEditing(true); }}
       title="Нажмите для редактирования (Markdown: **жирный**, *курсив*)"
     >
-      {renderMarkdown(value)}
+      {hasText ? (
+        renderMarkdown(value)
+      ) : (
+        <span className="text-muted-foreground/70 italic">Нажмите, чтобы добавить текст</span>
+      )}
     </Tag>
   );
 };

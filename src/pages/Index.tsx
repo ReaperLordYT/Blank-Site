@@ -116,20 +116,26 @@ const Index: React.FC = () => {
       <section className="container mx-auto px-4 py-16">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
           <motion.h2 variants={fadeUp} custom={0} className="section-title mb-10 text-center">Формат турнира</motion.h2>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {settings.formatStages.map((item, i) => (
-              <motion.div key={item.id} variants={fadeUp} custom={i} className="glass-card rounded-xl p-6 card-glow relative group">
-                {isAdmin && isEditing && (
-                  <button onClick={() => handleDeleteFormat(item.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Trash2 size={14} />
-                  </button>
-                )}
-                <div className="font-display text-3xl font-bold text-primary mb-3">{i + 1}</div>
-                <EditableText value={item.title} onSave={val => handleUpdateFormat(item.id, 'title', val)} as="h3" className="font-heading font-bold text-lg text-foreground mb-2" />
-                <EditableText value={item.desc} onSave={val => handleUpdateFormat(item.id, 'desc', val)} as="p" className="text-sm text-muted-foreground" multiline />
-              </motion.div>
-            ))}
-          </div>
+          {settings.formatStages.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {settings.formatStages.map((item, i) => (
+                <motion.div key={item.id} variants={fadeUp} custom={i} className="glass-card rounded-xl p-6 card-glow relative group">
+                  {isAdmin && isEditing && (
+                    <button onClick={() => handleDeleteFormat(item.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                  <div className="font-display text-3xl font-bold text-primary mb-3">{i + 1}</div>
+                  <EditableText value={item.title} onSave={val => handleUpdateFormat(item.id, 'title', val)} as="h3" className="font-heading font-bold text-lg text-foreground mb-2" />
+                  <EditableText value={item.desc} onSave={val => handleUpdateFormat(item.id, 'desc', val)} as="p" className="text-sm text-muted-foreground" multiline />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto glass-card rounded-xl p-8 text-center text-muted-foreground">
+              Информация будет указана позже.
+            </div>
+          )}
           {isAdmin && isEditing && (
             <div className="flex justify-center mt-4">
               <button onClick={handleAddFormat} className="px-4 py-2 border border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary transition-colors flex items-center gap-1 text-sm">
