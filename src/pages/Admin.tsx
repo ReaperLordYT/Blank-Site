@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
 import { motion } from 'framer-motion';
-import { Shield, LogIn, Settings, Upload, Music, CheckCircle, AlertCircle, Loader2, RefreshCw, DatabaseBackup } from 'lucide-react';
+import { Shield, LogIn, Settings, Upload, Music, CheckCircle, AlertCircle, Loader2, RefreshCw, DatabaseBackup, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Admin: React.FC = () => {
@@ -188,15 +188,41 @@ const Admin: React.FC = () => {
               <input className="w-full bg-background border rounded-lg p-3 text-foreground" value={settings.contactAdmin2} onChange={e => setSettings(p => ({ ...p, contactAdmin2: e.target.value }))} />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm text-muted-foreground mb-1 block">Контакты (для страницы контактов и футера, по одной строке)</label>
-              <textarea
-                className="w-full bg-background border rounded-lg p-3 text-foreground min-h-[120px]"
-                value={settings.contactsList.join('\n')}
-                onChange={e => setSettings(p => ({
-                  ...p,
-                  contactsList: e.target.value.split('\n').map(x => x.trim()).filter(Boolean),
-                }))}
-              />
+              <label className="text-sm text-muted-foreground mb-2 block">Контакты (для страницы контактов и футера)</label>
+              <div className="space-y-2">
+                {settings.contactsList.map((contact, idx) => (
+                  <div key={`${contact}-${idx}`} className="flex gap-2">
+                    <input
+                      className="flex-1 bg-background border rounded-lg p-3 text-foreground"
+                      value={contact}
+                      onChange={e => setSettings(p => {
+                        const next = [...p.contactsList];
+                        next[idx] = e.target.value;
+                        return { ...p, contactsList: next };
+                      })}
+                      placeholder="Новый контакт"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSettings(p => ({
+                        ...p,
+                        contactsList: p.contactsList.filter((_, i) => i !== idx),
+                      }))}
+                      className="px-3 py-2 border rounded-lg text-muted-foreground hover:text-destructive"
+                      title="Удалить контакт"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setSettings(p => ({ ...p, contactsList: [...p.contactsList, ''] }))}
+                  className="px-4 py-2 border border-dashed rounded-lg text-muted-foreground hover:text-primary hover:border-primary inline-flex items-center gap-2"
+                >
+                  <Plus size={14} /> Добавить контакт
+                </button>
+              </div>
             </div>
             <div className="md:col-span-2">
               <label className="text-sm text-muted-foreground mb-1 block">Текст в футере (копирайт)</label>

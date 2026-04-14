@@ -37,6 +37,22 @@ const Teams: React.FC = () => {
     });
   });
 
+  const q = search.trim().toLowerCase();
+  const matchedPlayers = q
+    ? data.teams.flatMap(team =>
+        team.players
+          .filter(player => {
+            const steam64 = player.steamLink.match(/\d{16,20}/)?.[0] ?? '';
+            return (
+              player.nickname.toLowerCase().includes(q) ||
+              player.steamLink.toLowerCase().includes(q) ||
+              steam64.includes(q)
+            );
+          })
+          .map(player => ({ team, player }))
+      )
+    : [];
+
   const getTitleClass = (style?: Team['titleStyle']) =>
     style === 'current'
       ? 'bg-gradient-to-r from-amber-300/30 via-yellow-300/25 to-orange-400/30 text-amber-200 border border-amber-300/40 shadow-[0_0_20px_rgba(251,191,36,0.25)]'
@@ -82,6 +98,27 @@ const Teams: React.FC = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {matchedPlayers.length > 0 && (
+            <div className="md:col-span-2 lg:col-span-3 mb-2">
+              <h2 className="font-heading font-semibold text-foreground mb-3">Найденные игроки</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {matchedPlayers.map(({ team, player }, idx) => {
+                  const steam64 = player.steamLink.match(/\d{16,20}/)?.[0] ?? '—';
+                  return (
+                    <Link
+                      key={`${team.id}-${player.id}-${idx}`}
+                      to={`/teams/${team.id}`}
+                      className="glass-card rounded-xl p-4 card-glow hover:border-primary/40 border border-transparent transition-colors"
+                    >
+                      <p className="font-heading font-semibold text-foreground">{player.nickname}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Steam64: {steam64}</p>
+                      <p className="text-xs text-primary mt-2">Команда: {team.name} [{team.tag}]</p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {filteredTeams.map((team, i) => (
             <motion.div
               key={team.id}

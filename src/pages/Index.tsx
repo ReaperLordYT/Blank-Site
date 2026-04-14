@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTournament } from '@/context/TournamentContext';
 import EditableText from '@/components/EditableText';
 import PageLayout from '@/components/PageLayout';
-import { Calendar, Users, Trophy, MessageCircle, FileText, ChevronRight, HelpCircle, Tv, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Users, Trophy, MessageCircle, FileText, ChevronRight, Tv, Plus, Trash2 } from 'lucide-react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -39,17 +39,6 @@ const Index: React.FC = () => {
   };
   const handleDeleteFormat = (id: string) => {
     updateSettings({ formatStages: settings.formatStages.filter(f => f.id !== id) });
-  };
-
-  // FAQ
-  const handleUpdateFaq = (id: string, field: 'q' | 'a', val: string) => {
-    updateSettings({ faqItems: settings.faqItems.map(f => f.id === id ? { ...f, [field]: val } : f) });
-  };
-  const handleAddFaq = () => {
-    updateSettings({ faqItems: [...settings.faqItems, { id: Date.now().toString(), q: 'Новый вопрос?', a: 'Ответ' }] });
-  };
-  const handleDeleteFaq = (id: string) => {
-    updateSettings({ faqItems: settings.faqItems.filter(f => f.id !== id) });
   };
 
   return (
@@ -242,42 +231,6 @@ const Index: React.FC = () => {
         )}
       </section>
 
-      {/* FAQ */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="section-title mb-10 text-center">Частые вопросы</h2>
-        <div className="max-w-3xl mx-auto space-y-4">
-          {settings.faqItems.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="glass-card rounded-xl relative group"
-            >
-              {isAdmin && isEditing && (
-                <button onClick={() => handleDeleteFaq(item.id)} className="absolute top-3 right-3 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  <Trash2 size={14} />
-                </button>
-              )}
-              <details className="group/details">
-                <summary className="px-6 py-4 cursor-pointer font-heading font-semibold text-foreground flex items-center gap-3 list-none">
-                  <HelpCircle size={18} className="text-primary flex-shrink-0" />
-                  <EditableText value={item.q} onSave={val => handleUpdateFaq(item.id, 'q', val)} as="span" className="inline" />
-                </summary>
-                <div className="px-6 pb-4">
-                  <EditableText value={item.a} onSave={val => handleUpdateFaq(item.id, 'a', val)} as="p" className="text-muted-foreground text-sm" multiline />
-                </div>
-              </details>
-            </motion.div>
-          ))}
-          {isAdmin && isEditing && (
-            <button onClick={handleAddFaq} className="w-full py-3 border border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary transition-colors flex items-center justify-center gap-1 text-sm">
-              <Plus size={14} /> Добавить вопрос
-            </button>
-          )}
-        </div>
-      </section>
     </PageLayout>
   );
 };

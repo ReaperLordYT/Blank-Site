@@ -267,9 +267,19 @@ export async function saveTournamentData(data: TournamentData): Promise<void> {
     team_ids: group.teamIds,
   }));
 
+  const { data: currentSettingsRow } = await supabase
+    .from('site_settings')
+    .select('payload')
+    .eq('id', 1)
+    .maybeSingle();
+  const mergedSettings = {
+    ...((currentSettingsRow?.payload || {}) as Record<string, unknown>),
+    ...(data.settings as Record<string, unknown>),
+  };
+
   const { error: settingsErr } = await supabase
     .from('site_settings')
-    .upsert({ id: 1, payload: data.settings }, { onConflict: 'id' });
+    .upsert({ id: 1, payload: mergedSettings }, { onConflict: 'id' });
   if (settingsErr) throw settingsErr;
 
   const { error: metaErr } = await supabase

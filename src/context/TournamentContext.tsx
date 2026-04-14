@@ -164,7 +164,6 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isEditing, setIsEditing] = useState(false);
   const [backups, setBackups] = useState<BackupSnapshot[]>([]);
   const pendingDataRef = useRef<TournamentData | null>(null);
-  const autoSaveTimerRef = useRef<number | null>(null);
 
   // ── Fetch fresh data from Supabase ──────────────────────────────────────
 const loadFromSupabase = useCallback(async () => {
@@ -379,18 +378,6 @@ const loadFromSupabase = useCallback(async () => {
       setSaving(false);
     }
   }, [loadFromSupabase]);
-
-  // Autosave for realtime editing
-  useEffect(() => {
-    if (!isAdmin || !hasUnsavedChanges || saving) return;
-    if (autoSaveTimerRef.current) window.clearTimeout(autoSaveTimerRef.current);
-    autoSaveTimerRef.current = window.setTimeout(() => {
-      void saveNow();
-    }, 1000);
-    return () => {
-      if (autoSaveTimerRef.current) window.clearTimeout(autoSaveTimerRef.current);
-    };
-  }, [isAdmin, hasUnsavedChanges, saving, saveNow]);
 
   return (
     <TournamentContext.Provider value={{
