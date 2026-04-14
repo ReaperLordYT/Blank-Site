@@ -51,7 +51,7 @@ const PageLayout: React.FC<{ children: React.ReactNode; hideFooter?: boolean }> 
       <div className="fixed inset-0 bg-background/70 pointer-events-none z-0" />
       <div
         ref={catRef}
-        className={`fixed left-[-14px] bottom-8 z-[120] pointer-events-none select-none hidden md:block transition-transform duration-500 ${
+        className={`fixed left-[-17px] bottom-8 z-[120] pointer-events-none select-none hidden md:block transition-transform duration-500 ${
           showCat ? 'translate-x-0' : '-translate-x-[120%]'
         }`}
       >
