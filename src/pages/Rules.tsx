@@ -52,7 +52,7 @@ const Rules: React.FC = () => {
       ? `<a href="${soloApplyLink}" target="_blank" rel="noopener noreferrer" class="rules-inline-link"><span>📝 Solo</span><span>↗</span></a>`
       : `<span class="rules-inline-link rules-inline-link-muted">📝 Solo (ссылка не задана)</span>`;
 
-    const freePlayersLinkHtml = `<a href="${getFreePlayersPageUrl()}" class="rules-inline-link"><span>👥 Свободные игроки</span><span>↗</span></a>`;
+    const freePlayersLinkHtml = `<a href="${getFreePlayersPageUrl()}" class="rules-inline-link rules-inline-link-free"><span>Свободные игроки</span><span aria-hidden="true">↗</span></a>`;
 
     return html
       .replaceAll(`<p>${TEAM_BUTTON_TOKEN}</p>`, `<p>${teamButtonHtml}</p>`)
