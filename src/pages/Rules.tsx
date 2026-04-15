@@ -8,6 +8,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 const DEFAULT_RULES_BANNER = '/rules-banner.png';
 const TEAM_BUTTON_TOKEN = '{{TEAM_BUTTON}}';
 const SOLO_BUTTON_TOKEN = '{{SOLO_BUTTON}}';
+const FREE_PLAYERS_LINK_TOKEN = '{{FREE_PLAYERS_LINK}}';
 
 const resolveBannerUrl = (rawValue?: string) => {
   const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
@@ -17,17 +18,10 @@ const resolveBannerUrl = (rawValue?: string) => {
   return `${baseUrl}${value.replace(/^\/+/, '')}`;
 };
 
-const PROMO_BLOCK_HTML = `
-<p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
-<p>Снова собираем команды, снова считаем MMR и снова смотрим кто на самом деле умеет в Dota. Регистрация открыта - не тяни.</p>
-<p><strong>- &nbsp;Начало - 25.04.2026</strong></p>
-<p><strong>- &nbsp;Лимит MMR - 35 000</strong></p>
-<p><strong>- &nbsp;Формат - 5 x 5 Capitans Mode</strong></p>
-<p><strong>- &nbsp;Приз - 5 000 рублей</strong></p>
-<p><strong>- &nbsp;Состав - 5 основных + до 2 запасных</strong></p>
-<p><strong>- Дата проведения - 25.04.2026 - 26.04.2026</strong></p>
-<p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
-`.trim();
+const getFreePlayersPageUrl = () => {
+  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+  return `${baseUrl}#/free-players`;
+};
 
 const Rules: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings, saveNow, saving, saveError } = useTournament();
@@ -38,15 +32,7 @@ const Rules: React.FC = () => {
   const [bannerSrc, setBannerSrc] = useState(resolveBannerUrl(rulesBannerImage));
   const [bannerFailed, setBannerFailed] = useState(false);
 
-  const normalizedRulesContent = useMemo(() => {
-    const trimmed = rulesContent.trim();
-    if (!trimmed) return trimmed;
-    if (trimmed.includes('Снова собираем команды, снова считаем MMR')) return trimmed;
-    if (!trimmed.includes('NPC Championship - Официальный регламент')) return trimmed;
-    return `${PROMO_BLOCK_HTML}\n${trimmed}`;
-  }, [rulesContent]);
-
-  const trimmedRulesContent = useMemo(() => normalizedRulesContent.trim(), [normalizedRulesContent]);
+  const trimmedRulesContent = useMemo(() => rulesContent.trim(), [rulesContent]);
   const teamApplyLink = data.settings.googleFormLink?.trim();
   const soloApplyLink = data.settings.freePlayerFormLink?.trim();
 
@@ -66,11 +52,15 @@ const Rules: React.FC = () => {
       ? `<a href="${soloApplyLink}" target="_blank" rel="noopener noreferrer" class="rules-inline-link"><span>📝 Solo</span><span>↗</span></a>`
       : `<span class="rules-inline-link rules-inline-link-muted">📝 Solo (ссылка не задана)</span>`;
 
+    const freePlayersLinkHtml = `<a href="${getFreePlayersPageUrl()}" class="rules-inline-link"><span>👥 Свободные игроки</span><span>↗</span></a>`;
+
     return html
       .replaceAll(`<p>${TEAM_BUTTON_TOKEN}</p>`, `<p>${teamButtonHtml}</p>`)
       .replaceAll(`<p>${SOLO_BUTTON_TOKEN}</p>`, `<p>${soloButtonHtml}</p>`)
+      .replaceAll(`<p>${FREE_PLAYERS_LINK_TOKEN}</p>`, `<p>${freePlayersLinkHtml}</p>`)
       .replaceAll(TEAM_BUTTON_TOKEN, teamButtonHtml)
-      .replaceAll(SOLO_BUTTON_TOKEN, soloButtonHtml);
+      .replaceAll(SOLO_BUTTON_TOKEN, soloButtonHtml)
+      .replaceAll(FREE_PLAYERS_LINK_TOKEN, freePlayersLinkHtml);
   }, [trimmedRulesContent, teamApplyLink, soloApplyLink]);
 
   // If link mode and we have a link, redirect
@@ -242,11 +232,11 @@ const Rules: React.FC = () => {
                   </p>
                 )}
                   <p className="text-xs text-muted-foreground">
-                    Для ручного размещения кнопок используйте в тексте токены: <code>{TEAM_BUTTON_TOKEN}</code> и <code>{SOLO_BUTTON_TOKEN}</code>
-                    (или кнопки Team/Solo в панели редактора).
+                    Для ручного размещения ссылок используйте токены: <code>{TEAM_BUTTON_TOKEN}</code>, <code>{SOLO_BUTTON_TOKEN}</code>, <code>{FREE_PLAYERS_LINK_TOKEN}</code>
+                    (или кнопки в панели редактора).
                   </p>
                 <RichTextEditor
-                  value={normalizedRulesContent}
+                  value={rulesContent}
                   onChange={(nextValue) => updateSettings({ rulesContent: nextValue })}
                 />
               </div>

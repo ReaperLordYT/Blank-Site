@@ -141,6 +141,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
         >
           <Link2 size={13} /> Solo
         </button>
+        <button
+          type="button"
+          className="h-8 px-2 rounded-md border border-border/70 bg-background/90 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors text-xs inline-flex items-center gap-1"
+          onClick={() => editor.chain().focus().insertContent('<p>{{FREE_PLAYERS_LINK}}</p>').run()}
+          title="Вставить ссылку на свободных игроков"
+        >
+          <Link2 size={13} /> Free players
+        </button>
         <label className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
           Цвет
           <input
