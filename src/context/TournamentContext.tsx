@@ -15,6 +15,14 @@ import {
 
 const defaultRulesContent = `
 <p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
+<p>Снова собираем команды, снова считаем MMR и снова смотрим кто на самом деле умеет в Dota. Регистрация открыта - не тяни.</p>
+<p><strong>- &nbsp;Начало - 25.04.2026</strong></p>
+<p><strong>- &nbsp;Лимит MMR - 35 000</strong></p>
+<p><strong>- &nbsp;Формат - 5 x 5 Capitans Mode</strong></p>
+<p><strong>- &nbsp;Приз - 5 000 рублей</strong></p>
+<p><strong>- &nbsp;Состав - 5 основных + до 2 запасных</strong></p>
+<p><strong>- Дата проведения - 25.04.2026 - 26.04.2026</strong></p>
+<p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
 <p>NPC Championship - Официальный регламент<br>Все участники обязаны соблюдать данный регламент.</p>
 <h2><strong>1. КОМАНДЫ И ИГРОКИ</strong></h2>
 <h3><strong>1.1 Состав команды</strong></h3>

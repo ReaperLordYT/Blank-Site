@@ -1,9 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
 import { motion } from 'framer-motion';
-import { ExternalLink, Link as LinkIcon, FileText, Save } from 'lucide-react';
+import { ExternalLink, Link as LinkIcon, FileText, Save, RotateCcw, Pencil } from 'lucide-react';
 import RichTextEditor from '@/components/RichTextEditor';
+
+const PROMO_BLOCK_HTML = `
+<p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
+<p>Снова собираем команды, снова считаем MMR и снова смотрим кто на самом деле умеет в Dota. Регистрация открыта - не тяни.</p>
+<p><strong>- &nbsp;Начало - 25.04.2026</strong></p>
+<p><strong>- &nbsp;Лимит MMR - 35 000</strong></p>
+<p><strong>- &nbsp;Формат - 5 x 5 Capitans Mode</strong></p>
+<p><strong>- &nbsp;Приз - 5 000 рублей</strong></p>
+<p><strong>- &nbsp;Состав - 5 основных + до 2 запасных</strong></p>
+<p><strong>- Дата проведения - 25.04.2026 - 26.04.2026</strong></p>
+<p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
+`.trim();
 
 const Rules: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings } = useTournament();
@@ -11,8 +23,19 @@ const Rules: React.FC = () => {
   const rulesContent = data.settings.rulesContent || '';
   const rulesBannerImage = data.settings.rulesBannerImage || '';
   const canEditRules = isAdmin && isEditing;
+  const [bannerFailed, setBannerFailed] = useState(false);
 
-  const trimmedRulesContent = useMemo(() => rulesContent.trim(), [rulesContent]);
+  const normalizedRulesContent = useMemo(() => {
+    const trimmed = rulesContent.trim();
+    if (!trimmed) return trimmed;
+    if (trimmed.includes('Снова собираем команды, снова считаем MMR')) return trimmed;
+    if (!trimmed.includes('NPC Championship - Официальный регламент')) return trimmed;
+    return `${PROMO_BLOCK_HTML}\n${trimmed}`;
+  }, [rulesContent]);
+
+  const trimmedRulesContent = useMemo(() => normalizedRulesContent.trim(), [normalizedRulesContent]);
+  const teamApplyLink = data.settings.googleFormLink?.trim();
+  const soloApplyLink = data.settings.freePlayerFormLink?.trim();
 
   // If link mode and we have a link, redirect
   if (rulesMode === 'link' && data.settings.rulesLink) {
@@ -100,25 +123,44 @@ const Rules: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card rounded-2xl p-4"
             >
-              {rulesBannerImage ? (
+              {rulesBannerImage && !bannerFailed ? (
                 <img
                   src={rulesBannerImage}
                   alt="Баннер регламента"
-                  className="w-full rounded-xl border border-border/60 object-cover max-h-[380px]"
+                  className="w-full rounded-xl border border-border/60 object-contain bg-background/40 max-h-[420px]"
+                  onError={() => setBannerFailed(true)}
                 />
               ) : (
-                <div className="text-sm text-muted-foreground px-2 py-1">Добавьте ссылку на баннер регламента.</div>
+                <div className="rounded-xl border border-dashed border-border/80 px-4 py-5 text-sm text-muted-foreground bg-background/30">
+                  Не удалось загрузить баннер. Проверьте ссылку или нажмите "Сбросить", чтобы вернуть `/rules-banner.png`.
+                </div>
               )}
 
               {canEditRules && (
-                <div className="mt-3">
-                  <label className="text-xs text-muted-foreground mb-1 block">Ссылка на баннер</label>
-                  <input
-                    className="w-full bg-background border rounded-lg p-2 text-foreground text-sm"
-                    placeholder="/rules-banner.png или https://..."
-                    value={rulesBannerImage}
-                    onChange={e => updateSettings({ rulesBannerImage: e.target.value })}
-                  />
+                <div className="mt-3 flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Ссылка на баннер</label>
+                    <input
+                      className="w-full bg-background border rounded-lg p-2 text-foreground text-sm"
+                      placeholder="/rules-banner.png или https://..."
+                      value={rulesBannerImage}
+                      onChange={e => {
+                        setBannerFailed(false);
+                        updateSettings({ rulesBannerImage: e.target.value });
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="h-10 px-3 rounded-lg border text-xs font-heading text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                    onClick={() => {
+                      setBannerFailed(false);
+                      updateSettings({ rulesBannerImage: '/rules-banner.png' });
+                    }}
+                    title="Вернуть баннер по умолчанию"
+                  >
+                    <RotateCcw size={13} /> Сбросить
+                  </button>
                 </div>
               )}
             </motion.div>
@@ -145,17 +187,43 @@ const Rules: React.FC = () => {
                   </button>
                 </div>
                 <RichTextEditor
-                  value={rulesContent}
+                  value={normalizedRulesContent}
                   onChange={(nextValue) => updateSettings({ rulesContent: nextValue })}
                 />
               </div>
             ) : (
-              <article
-                className="rules-content"
-                dangerouslySetInnerHTML={{
-                  __html: trimmedRulesContent || '<p>Регламент пока не заполнен.</p>',
-                }}
-              />
+              <div className="relative">
+                {(teamApplyLink || soloApplyLink) && (
+                  <div className="rules-quick-links">
+                    {teamApplyLink && (
+                      <a
+                        href={teamApplyLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rules-quick-link"
+                      >
+                        <Pencil size={14} /> Team <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {soloApplyLink && (
+                      <a
+                        href={soloApplyLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rules-quick-link"
+                      >
+                        <Pencil size={14} /> Solo <ExternalLink size={14} />
+                      </a>
+                    )}
+                  </div>
+                )}
+                <article
+                  className="rules-content"
+                  dangerouslySetInnerHTML={{
+                    __html: trimmedRulesContent || '<p>Регламент пока не заполнен.</p>',
+                  }}
+                />
+              </div>
             )}
           </motion.div>
         </div>

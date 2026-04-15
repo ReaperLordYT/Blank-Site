@@ -4,6 +4,8 @@ import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
+import Color from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, List, ListOrdered, Heading2, Heading3 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -21,6 +23,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     extensions: [
       StarterKit,
       Underline,
+      TextStyle,
+      Color,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
@@ -120,6 +124,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
           title="Нумерованный список"
         >
           <ListOrdered size={15} />
+        </button>
+        <label className="ml-2 flex items-center gap-2 text-xs text-muted-foreground">
+          Цвет
+          <input
+            type="color"
+            value={editor.getAttributes('textStyle').color || '#ffffff'}
+            onChange={(event) => editor.chain().focus().setColor(event.target.value).run()}
+            className="h-8 w-8 rounded border border-border/70 bg-transparent cursor-pointer"
+            title="Цвет текста"
+          />
+        </label>
+        <button
+          type="button"
+          className="h-8 px-2 rounded-md border border-border/70 bg-background/90 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors text-xs"
+          onClick={() => editor.chain().focus().unsetColor().run()}
+          title="Сбросить цвет"
+        >
+          Сброс
         </button>
       </div>
 
