@@ -10,6 +10,7 @@ import {
   listBackups,
   createBackupSnapshot,
   restoreBackupSnapshot,
+  deleteBackupSnapshot,
   BackupSnapshot,
 } from '@/integrations/supabase/storage';
 
@@ -260,6 +261,7 @@ interface TournamentContextType {
   refreshBackups: () => Promise<void>;
   createBackup: (note: string) => Promise<void>;
   restoreBackup: (backupId: string) => Promise<void>;
+  deleteBackup: (backupId: string) => Promise<void>;
 }
 
 const TournamentContext = createContext<TournamentContextType | null>(null);
@@ -495,6 +497,11 @@ const loadFromSupabase = useCallback(async () => {
     }
   }, [loadFromSupabase]);
 
+  const deleteBackup = useCallback(async (backupId: string) => {
+    await deleteBackupSnapshot(backupId);
+    await refreshBackups();
+  }, [refreshBackups]);
+
   return (
     <TournamentContext.Provider value={{
       data, isAdmin, isEditing, loading, saving, saveError,
@@ -507,7 +514,7 @@ const loadFromSupabase = useCallback(async () => {
       addGroup, updateGroup, deleteGroup,
       generateGroupMatches, getTeamById, getGroupStandings, withdrawTeam,
       refreshData: loadFromSupabase,
-      backups, refreshBackups, createBackup, restoreBackup,
+      backups, refreshBackups, createBackup, restoreBackup, deleteBackup,
     }}>
       {children}
     </TournamentContext.Provider>

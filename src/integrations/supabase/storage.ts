@@ -347,6 +347,15 @@ export async function restoreBackupSnapshot(backupId: string): Promise<void> {
   await saveTournamentData(data.snapshot as TournamentData);
 }
 
+export async function deleteBackupSnapshot(backupId: string): Promise<void> {
+  ensureSupabaseConfigured();
+  const { error } = await supabase
+    .from('backups')
+    .delete()
+    .eq('id', backupId);
+  if (error) throw error;
+}
+
 export function subscribeTournamentUpdates(onChange: () => void): () => void {
   ensureSupabaseConfigured();
   const channel = supabase

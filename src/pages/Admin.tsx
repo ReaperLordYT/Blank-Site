@@ -6,7 +6,7 @@ import { Shield, LogIn, Settings, Upload, Music, CheckCircle, AlertCircle, Loade
 import { useNavigate } from 'react-router-dom';
 
 const Admin: React.FC = () => {
-  const { isAdmin, login, data, updateSettings, toggleEditing, isEditing, saving, saveError, refreshData, backups, refreshBackups, createBackup, restoreBackup } = useTournament();
+  const { isAdmin, login, data, updateSettings, toggleEditing, isEditing, saving, saveError, refreshData, backups, refreshBackups, createBackup, restoreBackup, deleteBackup } = useTournament();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [backupNote, setBackupNote] = useState('');
@@ -15,6 +15,7 @@ const Admin: React.FC = () => {
   const musicFileRef = useRef<HTMLInputElement>(null);
   const [settings, setSettings] = useState(data.settings);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingBackupId, setDeletingBackupId] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +50,17 @@ const Admin: React.FC = () => {
   const handleCreateBackup = async () => {
     await createBackup(backupNote.trim() || 'manual backup');
     setBackupNote('');
+  };
+
+  const handleDeleteBackup = async (backupId: string) => {
+    const confirmed = window.confirm('Удалить этот бэкап? Это действие нельзя отменить.');
+    if (!confirmed) return;
+    setDeletingBackupId(backupId);
+    try {
+      await deleteBackup(backupId);
+    } finally {
+      setDeletingBackupId(null);
+    }
   };
 
   if (!isAdmin) {
@@ -146,12 +158,21 @@ const Admin: React.FC = () => {
                   <p className="text-sm text-foreground truncate">{backup.note || 'snapshot'}</p>
                   <p className="text-xs text-muted-foreground">{new Date(backup.createdAt).toLocaleString()} · {backup.createdBy}</p>
                 </div>
-                <button
-                  onClick={() => restoreBackup(backup.id)}
-                  className="px-3 py-1.5 border rounded-lg text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Восстановить
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => restoreBackup(backup.id)}
+                    className="px-3 py-1.5 border rounded-lg text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Восстановить
+                  </button>
+                  <button
+                    onClick={() => handleDeleteBackup(backup.id)}
+                    disabled={deletingBackupId === backup.id}
+                    className="px-3 py-1.5 border rounded-lg text-xs text-muted-foreground hover:text-destructive disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {deletingBackupId === backup.id ? 'Удаление...' : 'Удалить'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

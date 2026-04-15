@@ -30,7 +30,7 @@ const PROMO_BLOCK_HTML = `
 `.trim();
 
 const Rules: React.FC = () => {
-  const { data, isAdmin, isEditing, updateSettings } = useTournament();
+  const { data, isAdmin, isEditing, updateSettings, saveNow, saving, saveError } = useTournament();
   const rulesMode = data.settings.rulesMode || 'page';
   const rulesContent = data.settings.rulesContent || '';
   const rulesBannerImage = data.settings.rulesBannerImage || DEFAULT_RULES_BANNER;
@@ -160,19 +160,21 @@ const Rules: React.FC = () => {
               className="glass-card rounded-2xl p-4"
             >
               {bannerSrc && !bannerFailed ? (
-                <img
-                  src={bannerSrc}
-                  alt="Баннер регламента"
-                  className="w-full rounded-xl border border-border/60 object-contain bg-background/40 max-h-[420px]"
-                  onError={() => {
-                    const fallbackSrc = resolveBannerUrl(DEFAULT_RULES_BANNER);
-                    if (bannerSrc !== fallbackSrc) {
-                      setBannerSrc(fallbackSrc);
-                      return;
-                    }
-                    setBannerFailed(true);
-                  }}
-                />
+                <div className="w-full aspect-video rounded-xl border border-border/60 overflow-hidden bg-background/40">
+                  <img
+                    src={bannerSrc}
+                    alt="Баннер регламента"
+                    className="w-full h-full object-cover object-center"
+                    onError={() => {
+                      const fallbackSrc = resolveBannerUrl(DEFAULT_RULES_BANNER);
+                      if (bannerSrc !== fallbackSrc) {
+                        setBannerSrc(fallbackSrc);
+                        return;
+                      }
+                      setBannerFailed(true);
+                    }}
+                  />
+                </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-border/80 px-4 py-5 text-sm text-muted-foreground bg-background/30">
                   Не удалось загрузить баннер. Проверьте путь или нажмите "Сбросить", чтобы вернуть `rules-banner.png`.
@@ -224,13 +226,21 @@ const Rules: React.FC = () => {
                   </p>
                   <button
                     type="button"
-                    onClick={() => updateSettings({ rulesContent })}
+                    onClick={async () => {
+                      updateSettings({ rulesContent });
+                      await saveNow();
+                    }}
                     className="px-3 py-1.5 rounded-lg border text-xs font-heading text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
                     title="Сохранить изменения регламента"
                   >
-                    <Save size={14} /> Обновить
+                    <Save size={14} /> {saving ? 'Сохраняю...' : 'Сохранить'}
                   </button>
                 </div>
+                {saveError && (
+                  <p className="text-xs text-destructive">
+                    Ошибка сохранения: {saveError}
+                  </p>
+                )}
                   <p className="text-xs text-muted-foreground">
                     Для ручного размещения кнопок используйте в тексте токены: <code>{TEAM_BUTTON_TOKEN}</code> и <code>{SOLO_BUTTON_TOKEN}</code>
                     (или кнопки Team/Solo в панели редактора).
