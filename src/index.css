@@ -217,18 +217,6 @@
     @apply text-muted-foreground border-border/60;
   }
 
-  .rules-inline-link-free::before {
-    content: '';
-    width: 18px;
-    height: 18px;
-    display: inline-block;
-    background-color: currentColor;
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Z'/%3E%3Cpath d='M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Z'/%3E%3Cpath d='M16 11c-1.67 0-3.33.83-4 2.5'/%3E%3Cpath d='M8 11c1.67 0 3.33.83 4 2.5'/%3E%3Cpath d='M2 20c0-2.5 2.5-4.5 6-4.5'/%3E%3Cpath d='M22 20c0-2.5-2.5-4.5-6-4.5'/%3E%3C/svg%3E");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    opacity: 0.9;
-  }
 }
 
 @keyframes cat-peek-float {

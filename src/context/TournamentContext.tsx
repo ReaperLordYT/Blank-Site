@@ -16,7 +16,7 @@ import {
 
 const defaultRulesContent = `
 <p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
-<p>NPC Championship 2.0 — Официальный регламент<br>Все участники обязаны соблюдать данный регламент.</p>
+<p>NPC Championship — Официальный регламент<br>Все участники обязаны соблюдать данный регламент.</p>
 <h2><strong>1. КОМАНДЫ И ИГРОКИ</strong></h2>
 <h3><strong>1.1 Состав команды</strong></h3>
 <ul>
