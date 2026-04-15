@@ -9,6 +9,15 @@ const DEFAULT_RULES_BANNER = '/rules-banner.png';
 const TEAM_BUTTON_TOKEN = '{{TEAM_BUTTON}}';
 const SOLO_BUTTON_TOKEN = '{{SOLO_BUTTON}}';
 
+const resolveBannerUrl = (rawValue?: string, version = 1) => {
+  const value = (rawValue || '').trim();
+  const fallback = `${DEFAULT_RULES_BANNER}?v=${version}`;
+  if (!value) return fallback;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  if (value.startsWith('/')) return `${value}?v=${version}`;
+  return `${import.meta.env.BASE_URL}${value.replace(/^\/+/, '')}?v=${version}`;
+};
+
 const PROMO_BLOCK_HTML = `
 <p><strong>Blank &nbsp;&nbsp;&nbsp;&nbsp;&middot; &nbsp;&nbsp;&nbsp;&nbsp;"NPC Championship"</strong></p>
 <p>Снова собираем команды, снова считаем MMR и снова смотрим кто на самом деле умеет в Dota. Регистрация открыта - не тяни.</p>
@@ -27,7 +36,8 @@ const Rules: React.FC = () => {
   const rulesContent = data.settings.rulesContent || '';
   const rulesBannerImage = data.settings.rulesBannerImage || DEFAULT_RULES_BANNER;
   const canEditRules = isAdmin && isEditing;
-  const [bannerSrc, setBannerSrc] = useState(rulesBannerImage);
+  const [bannerVersion, setBannerVersion] = useState(1);
+  const [bannerSrc, setBannerSrc] = useState(resolveBannerUrl(rulesBannerImage, 1));
 
   const normalizedRulesContent = useMemo(() => {
     const trimmed = rulesContent.trim();
@@ -42,8 +52,8 @@ const Rules: React.FC = () => {
   const soloApplyLink = data.settings.freePlayerFormLink?.trim();
 
   React.useEffect(() => {
-    setBannerSrc(rulesBannerImage || DEFAULT_RULES_BANNER);
-  }, [rulesBannerImage]);
+    setBannerSrc(resolveBannerUrl(rulesBannerImage, bannerVersion));
+  }, [rulesBannerImage, bannerVersion]);
 
   const rulesHtmlWithButtons = useMemo(() => {
     const html = trimmedRulesContent || '<p>Регламент пока не заполнен.</p>';
@@ -155,8 +165,10 @@ const Rules: React.FC = () => {
                   alt="Баннер регламента"
                   className="w-full rounded-xl border border-border/60 object-contain bg-background/40 max-h-[420px]"
                   onError={() => {
-                    if (bannerSrc !== DEFAULT_RULES_BANNER) {
-                      setBannerSrc(DEFAULT_RULES_BANNER);
+                    const fallbackSrc = resolveBannerUrl(DEFAULT_RULES_BANNER, bannerVersion + 1);
+                    if (bannerSrc !== fallbackSrc) {
+                      setBannerVersion(prev => prev + 1);
+                      setBannerSrc(fallbackSrc);
                     }
                   }}
                 />
@@ -175,7 +187,8 @@ const Rules: React.FC = () => {
                       placeholder="/rules-banner.png или https://..."
                       value={rulesBannerImage}
                       onChange={e => {
-                        setBannerSrc(e.target.value || DEFAULT_RULES_BANNER);
+                        setBannerVersion(prev => prev + 1);
+                        setBannerSrc(resolveBannerUrl(e.target.value, bannerVersion + 1));
                         updateSettings({ rulesBannerImage: e.target.value });
                       }}
                     />
@@ -184,7 +197,8 @@ const Rules: React.FC = () => {
                     type="button"
                     className="h-10 px-3 rounded-lg border text-xs font-heading text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
                     onClick={() => {
-                      setBannerSrc(DEFAULT_RULES_BANNER);
+                      setBannerVersion(prev => prev + 1);
+                      setBannerSrc(resolveBannerUrl(DEFAULT_RULES_BANNER, bannerVersion + 1));
                       updateSettings({ rulesBannerImage: DEFAULT_RULES_BANNER });
                     }}
                     title="Вернуть баннер по умолчанию"
