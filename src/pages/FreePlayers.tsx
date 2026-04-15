@@ -1,7 +1,8 @@
 import React from 'react';
 import PageLayout from '@/components/PageLayout';
 import { useTournament } from '@/context/TournamentContext';
-import { Plus, Trash2, FileText, ExternalLink, Swords, Sparkles, Shield, HelpingHand, HandHeart } from 'lucide-react';
+import { Plus, Trash2, FileText, ExternalLink, Swords, Sparkles, Shield, HelpingHand, HandHeart, Lock } from 'lucide-react';
+import { BowIcon } from '@/components/icons/BowIcon';
 
 const FreePlayers: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings } = useTournament();
@@ -106,7 +107,7 @@ const FreePlayers: React.FC = () => {
 
   const roleItems = [
     { id: 'carry', label: 'Carry', Icon: Swords },
-    { id: 'mid', label: 'Mid', Icon: Sparkles },
+    { id: 'mid', label: 'Mid', Icon: BowIcon },
     { id: 'offlane', label: 'Offlaner', Icon: Shield },
     { id: 'soft', label: 'Soft Support', Icon: HelpingHand },
     { id: 'hard', label: 'Full Support', Icon: HandHeart },
@@ -265,32 +266,36 @@ const FreePlayers: React.FC = () => {
                       <span className="text-foreground">{player.discord || '—'}</span>
                     )}
                   </p>
-                  <p className="text-muted-foreground">Позиция: <span className="text-foreground">{player.position || '—'}</span></p>
-                  <p className="text-muted-foreground">MMR: <span className="text-foreground">{player.mmr || 0}</span></p>
-                  {roles.length > 0 && (
-                    <div className="pt-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {roleItems
-                          .filter(r => roles.includes(r.id))
-                          .map(({ id, label, Icon }) => (
-                            <div
-                              key={id}
-                              className="role-split is-active"
-                              title={label}
-                              aria-label={label}
-                            >
-                              <span className="role-split__half role-split__left">
-                                <Icon size={18} />
+                  <div className="text-muted-foreground flex items-center gap-2 flex-wrap">
+                    <span>Позиция:</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {roleItems.map(({ id, label, Icon }) => {
+                        const active = roles.includes(id);
+                        return (
+                          <div
+                            key={id}
+                            className={`role-split ${active ? 'is-active' : 'role-split--locked'}`}
+                            title={active ? label : 'Не выбрано'}
+                            aria-label={active ? label : 'Не выбрано'}
+                          >
+                            <span className="role-split__half role-split__left">
+                              <Icon size={18} />
+                            </span>
+                            <span className="role-split__half role-split__right">
+                              <Icon size={18} />
+                            </span>
+                            {active && <span className="role-split__label">{label}</span>}
+                            {!active && (
+                              <span className="role-split__lock" aria-hidden="true">
+                                <Lock size={12} />
                               </span>
-                              <span className="role-split__half role-split__right">
-                                <Icon size={18} />
-                              </span>
-                              <span className="role-split__label">{label}</span>
-                            </div>
-                          ))}
-                      </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
+                  <p className="text-muted-foreground">MMR: <span className="text-foreground">{player.mmr || 0}</span></p>
                   {(steamUrl || dotabuffUrl) && (
                     <div className="flex gap-2 flex-wrap pt-1">
                       {steamUrl && (
