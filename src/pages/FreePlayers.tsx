@@ -239,8 +239,8 @@ const FreePlayers: React.FC = () => {
                 value={mmrSort}
                 onChange={e => setMmrSort(e.target.value as 'asc' | 'desc')}
               >
-                <option value="asc">MMR: низкий -> высокий</option>
-                <option value="desc">MMR: высокий -> низкий</option>
+                <option value="asc">MMR: низкий - высокий</option>
+                <option value="desc">MMR: высокий - низкий</option>
               </select>
 
               {(searchQuery.trim() || selectedRoles.length > 0 || mmrEnabled) && (
