@@ -14,6 +14,10 @@ const stageLabels: Record<string, string> = {
   final: 'Финал',
 };
 
+const LINEUP_SIZE = 5;
+const MAX_ACTIVE_SUBS = 2;
+const DEFAULT_MMR_LIMIT = 35000;
+
 const TeamDetail: React.FC = () => {
   const { id } = useParams();
   const { data, isAdmin, isEditing, withdrawTeam } = useTournament();
@@ -22,6 +26,8 @@ const TeamDetail: React.FC = () => {
   const [showWithdraw, setShowWithdraw] = React.useState(false);
   const [withdrawReason, setWithdrawReason] = React.useState('');
   const [selectedMatchId, setSelectedMatchId] = React.useState<string | null>(null);
+  const [mmrLimit, setMmrLimit] = React.useState(DEFAULT_MMR_LIMIT);
+  const [activePlayerIds, setActivePlayerIds] = React.useState<string[]>([]);
 
   if (!team) {
     return (
@@ -37,8 +43,37 @@ const TeamDetail: React.FC = () => {
   const totalMmr = team.players
     .filter(player => !player.isSubstitute)
     .reduce((s, p) => s + (p.mmr || 0), 0);
+  const sortedPlayers = [...team.players]
+    .map((player, originalIndex) => ({ player, originalIndex }))
+    .sort((a, b) => {
+      const aReserve = !!a.player.isSubstitute;
+      const bReserve = !!b.player.isSubstitute;
+      if (aReserve !== bReserve) return aReserve ? 1 : -1;
+
+      const aCaptain = !!a.player.isCaptain;
+      const bCaptain = !!b.player.isCaptain;
+      if (aCaptain !== bCaptain) return aCaptain ? -1 : 1;
+
+      return a.originalIndex - b.originalIndex;
+    })
+    .map(entry => entry.player);
   const teamMatches = data.matches.filter(m => m.team1Id === team.id || m.team2Id === team.id);
   const completed = teamMatches.filter(m => m.status === 'completed' && m.result);
+  const activePlayers = sortedPlayers.filter(player => activePlayerIds.includes(player.id));
+  const activeMmr = activePlayers.reduce((sum, player) => sum + (player.mmr || 0), 0);
+  const activeSubs = activePlayers.filter(player => player.isSubstitute).length;
+  const lineupReady = activePlayers.length === LINEUP_SIZE;
+  const subsWithinRule = activeSubs <= MAX_ACTIVE_SUBS;
+  const mmrWithinLimit = activeMmr <= mmrLimit;
+  const lineupValid = lineupReady && subsWithinRule && mmrWithinLimit;
+
+  React.useEffect(() => {
+    const defaultActive = sortedPlayers
+      .filter(player => !player.isSubstitute)
+      .slice(0, LINEUP_SIZE)
+      .map(player => player.id);
+    setActivePlayerIds(defaultActive);
+  }, [team.id]);
 
   let wins = 0, losses = 0, draws = 0;
   completed.forEach(m => {
@@ -166,7 +201,7 @@ const TeamDetail: React.FC = () => {
           {/* ── Players ───────────────────────────────────────────────────── */}
           <h2 className="font-heading text-2xl font-bold mb-6 text-foreground">Состав</h2>
           <div className="space-y-3 mb-10">
-            {team.players.map(player => (
+            {sortedPlayers.map(player => (
               <div key={player.id} className="glass-card rounded-xl p-5 flex flex-col md:flex-row md:items-center gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -194,6 +229,78 @@ const TeamDetail: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="glass-card rounded-2xl p-6 mb-10">
+            <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
+              <div>
+                <h3 className="font-heading text-xl font-bold text-foreground">Калькулятор состава на матч</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Отметьте 5 активных игроков. Калькулятор проверит лимит MMR и количество замен.
+                </p>
+              </div>
+              <label className="text-sm text-muted-foreground">
+                Лимит MMR
+                <input
+                  type="number"
+                  min={0}
+                  className="mt-1 w-36 bg-background border rounded-lg p-2 text-foreground"
+                  value={mmrLimit}
+                  onChange={e => setMmrLimit(Math.max(0, parseInt(e.target.value || '0', 10)))}
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              {sortedPlayers.map(player => {
+                const isActive = activePlayerIds.includes(player.id);
+                return (
+                  <label key={`lineup-${player.id}`} className="flex items-center justify-between gap-3 bg-background/40 border rounded-lg px-3 py-2">
+                    <span className="text-sm text-foreground">
+                      {player.nickname || 'Без ника'} ({player.mmr || 0} MMR)
+                      {player.isCaptain ? ' • Капитан' : ''}
+                      {player.isSubstitute ? ' • Запасной' : ''}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setActivePlayerIds(prev => {
+                          if (checked) return prev.includes(player.id) ? prev : [...prev, player.id];
+                          return prev.filter(id => id !== player.id);
+                        });
+                      }}
+                    />
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-3 text-center">
+              <div className="bg-background/50 rounded-xl p-3">
+                <p className="text-xl font-display font-bold text-foreground">{activePlayers.length}/{LINEUP_SIZE}</p>
+                <p className="text-xs text-muted-foreground">Активных игроков</p>
+              </div>
+              <div className="bg-background/50 rounded-xl p-3">
+                <p className={`text-xl font-display font-bold ${mmrWithinLimit ? 'text-green-400' : 'text-red-400'}`}>{activeMmr}</p>
+                <p className="text-xs text-muted-foreground">MMR активного состава</p>
+              </div>
+              <div className="bg-background/50 rounded-xl p-3">
+                <p className={`text-xl font-display font-bold ${subsWithinRule ? 'text-green-400' : 'text-red-400'}`}>{activeSubs}/{MAX_ACTIVE_SUBS}</p>
+                <p className="text-xs text-muted-foreground">Запасных в матче</p>
+              </div>
+            </div>
+
+            <div className={`mt-4 rounded-lg px-4 py-3 text-sm border ${lineupValid ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300'}`}>
+              {lineupValid
+                ? `Состав валиден. Запас по лимиту: ${mmrLimit - activeMmr} MMR.`
+                : [
+                    !lineupReady ? `Нужно выбрать ровно ${LINEUP_SIZE} игроков.` : null,
+                    !subsWithinRule ? `Одновременно можно выпускать не более ${MAX_ACTIVE_SUBS} запасных.` : null,
+                    !mmrWithinLimit ? `Лимит превышен на ${activeMmr - mmrLimit} MMR.` : null,
+                  ].filter(Boolean).join(' ')}
+            </div>
           </div>
 
           {/* ── Team Matches — detailed cards ─────────────────────────────── */}
