@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTournament } from '@/context/TournamentContext';
@@ -12,9 +12,10 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
 };
 
-/** Одна и та же «коробка» кнопки: высота блока + отступы, как у регистрации / регламента (не только текст). */
-const heroCtaBox =
-  'inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3.5 min-h-14 text-base sm:text-lg';
+/** База кнопок героя (отступы, текст). Минимальная высота — отдельно: нижний ряд может быть выше из‑за переноса текста. */
+const heroCtaBoxBase =
+  'inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3.5 text-base sm:text-lg';
+const heroCtaBox = `${heroCtaBoxBase} min-h-14`;
 
 const Index: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings, getTeamById } = useTournament();
@@ -45,6 +46,37 @@ const Index: React.FC = () => {
   const handleDeleteFormat = (id: string) => {
     updateSettings({ formatStages: settings.formatStages.filter(f => f.id !== id) });
   };
+
+  /** На sm+ высота ряда из 3 кнопок = высоте самой высокой (часто 2 строки у «Регистрации»). Подгоняем Discord под эту же высоту «коробки». */
+  const heroCtaRowRef = useRef<HTMLDivElement>(null);
+  const [discordBoxHeightPx, setDiscordBoxHeightPx] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    const row = heroCtaRowRef.current;
+    if (!row) return;
+
+    const mq = window.matchMedia('(min-width: 640px)');
+
+    const apply = () => {
+      if (!mq.matches) {
+        setDiscordBoxHeightPx(null);
+        return;
+      }
+      const h = Math.round(row.getBoundingClientRect().height);
+      if (h > 0) setDiscordBoxHeightPx(h);
+    };
+
+    const ro = new ResizeObserver(apply);
+    ro.observe(row);
+    mq.addEventListener('change', apply);
+    apply();
+
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener('change', apply);
+    };
+  }, [settings.freePlayerFormLink]);
 
   return (
     <PageLayout>
@@ -79,13 +111,21 @@ const Index: React.FC = () => {
                 href={settings.discordLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`btn-primary-gradient ${heroCtaBox} w-auto max-w-full sm:w-[calc((100%_-_2rem)_/_2)]`}
+                style={
+                  discordBoxHeightPx != null
+                    ? { height: discordBoxHeightPx, minHeight: discordBoxHeightPx, boxSizing: 'border-box' }
+                    : undefined
+                }
+                className={`btn-primary-gradient ${heroCtaBoxBase} ${discordBoxHeightPx == null ? 'min-h-14' : ''} box-border w-auto max-w-full sm:w-[calc((100%_-_2rem)_/_2)]`}
               >
                 <DiscordIcon size={20} className="shrink-0" />
                 Discord
               </a>
             </div>
-            <div className="flex w-full max-w-4xl flex-col flex-wrap justify-center gap-3 sm:flex-row sm:gap-4 sm:items-stretch">
+            <div
+              ref={heroCtaRowRef}
+              className="flex w-full max-w-4xl flex-col flex-wrap justify-center gap-3 sm:flex-row sm:gap-4 sm:items-stretch"
+            >
               <a
                 href={settings.googleFormLink}
                 target="_blank"
