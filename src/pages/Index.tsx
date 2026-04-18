@@ -12,6 +12,10 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
 };
 
+/** Одна и та же «коробка» кнопки: высота блока + отступы, как у регистрации / регламента (не только текст). */
+const heroCtaBox =
+  'inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3.5 min-h-14 text-base sm:text-lg';
+
 const Index: React.FC = () => {
   const { data, isAdmin, isEditing, updateSettings, getTeamById } = useTournament();
   const settings = data.settings;
@@ -75,18 +79,18 @@ const Index: React.FC = () => {
                 href={settings.discordLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary-gradient inline-flex w-auto max-w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-base sm:w-[calc((100%_-_2rem)_/_2)] sm:py-3 sm:text-lg"
+                className={`btn-primary-gradient ${heroCtaBox} w-auto max-w-full sm:w-[calc((100%_-_2rem)_/_2)]`}
               >
-                <DiscordIcon size={28} className="shrink-0" />
+                <DiscordIcon size={20} className="shrink-0" />
                 Discord
               </a>
             </div>
-            <div className="flex w-full max-w-4xl flex-col flex-wrap justify-center gap-3 sm:flex-row sm:gap-4">
+            <div className="flex w-full max-w-4xl flex-col flex-wrap justify-center gap-3 sm:flex-row sm:gap-4 sm:items-stretch">
               <a
                 href={settings.googleFormLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary-gradient w-full sm:flex-1 sm:min-w-[200px] justify-center px-5 sm:px-6 py-3 rounded-lg text-base sm:text-lg inline-flex items-center gap-2"
+                className={`btn-primary-gradient w-full sm:flex-1 sm:min-w-[200px] justify-center ${heroCtaBox}`}
               >
                 <Users size={20} /> Регистрация команды
               </a>
@@ -95,14 +99,14 @@ const Index: React.FC = () => {
                   href={settings.freePlayerFormLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-primary-gradient w-full sm:flex-1 sm:min-w-[200px] justify-center px-5 sm:px-6 py-3 rounded-lg text-base sm:text-lg inline-flex items-center gap-2"
+                  className={`btn-primary-gradient w-full sm:flex-1 sm:min-w-[200px] justify-center ${heroCtaBox}`}
                 >
                   <Users size={20} /> Я свободный игрок
                 </a>
               )}
               <Link
                 to="/rules"
-                className="w-full sm:flex-1 sm:min-w-[200px] justify-center px-5 sm:px-6 py-3 rounded-lg border border-border bg-card/50 hover:bg-card text-foreground font-heading font-semibold inline-flex items-center gap-2 transition-colors"
+                className={`w-full sm:flex-1 sm:min-w-[200px] justify-center border border-border bg-card/50 hover:bg-card text-foreground font-heading font-semibold transition-colors ${heroCtaBox}`}
               >
                 <FileText size={20} /> Регламент
               </Link>
