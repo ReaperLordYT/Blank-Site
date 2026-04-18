@@ -14,7 +14,7 @@ const fadeUp = {
 
 /** База кнопок героя (отступы, текст). Минимальная высота — отдельно: нижний ряд может быть выше из‑за переноса текста. */
 const heroCtaBoxBase =
-  'inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3.5 text-base sm:text-lg';
+  'inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3.5 text-base sm:text-lg font-bold tracking-wide';
 const heroCtaBox = `${heroCtaBoxBase} min-h-14`;
 
 const Index: React.FC = () => {
@@ -146,7 +146,7 @@ const Index: React.FC = () => {
               )}
               <Link
                 to="/rules"
-                className={`w-full sm:flex-1 sm:min-w-[200px] justify-center border border-border bg-card/50 hover:bg-card text-foreground font-heading font-semibold transition-colors ${heroCtaBox}`}
+                className={`w-full sm:flex-1 sm:min-w-[200px] justify-center border border-border bg-card/50 hover:bg-card text-foreground font-heading transition-colors ${heroCtaBox}`}
               >
                 <FileText size={20} /> Регламент
               </Link>
