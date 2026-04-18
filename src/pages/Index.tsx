@@ -69,16 +69,18 @@ const Index: React.FC = () => {
             as="p"
             className="text-base sm:text-lg md:text-xl text-muted-foreground font-heading mb-8 sm:mb-10 max-w-2xl mx-auto"
           />
-          <div className="flex flex-col items-center gap-4 sm:gap-5">
-            <a
-              href={settings.discordLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full max-w-sm sm:max-w-none items-center justify-center gap-3 rounded-xl bg-[#5865F2] px-8 py-3.5 sm:px-12 sm:py-4 text-base sm:text-lg font-heading font-semibold text-white shadow-[0_8px_32px_-4px_rgba(88,101,242,0.55)] ring-1 ring-white/15 transition hover:bg-[#4752C4] hover:shadow-[0_10px_36px_-4px_rgba(88,101,242,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5865F2] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              <DiscordIcon size={30} className="shrink-0" />
-              Discord
-            </a>
+          <div className="flex w-full flex-col items-center gap-4 sm:gap-5">
+            <div className="flex w-full max-w-4xl justify-center">
+              <a
+                href={settings.discordLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary-gradient inline-flex w-auto max-w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-base sm:w-[calc((100%_-_2rem)_/_2)] sm:py-3 sm:text-lg"
+              >
+                <DiscordIcon size={28} className="shrink-0" />
+                Discord
+              </a>
+            </div>
             <div className="flex w-full max-w-4xl flex-col flex-wrap justify-center gap-3 sm:flex-row sm:gap-4">
               <a
                 href={settings.googleFormLink}
